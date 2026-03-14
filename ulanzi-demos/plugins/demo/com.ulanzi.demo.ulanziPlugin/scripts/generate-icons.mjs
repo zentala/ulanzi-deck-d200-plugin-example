@@ -6,7 +6,7 @@
  * Usage: node scripts/generate-icons.mjs
  */
 
-import { createCanvas } from 'canvas';
+import { createCanvas } from '@napi-rs/canvas';
 import { writeFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -23,6 +23,7 @@ mkdirSync(ICONS_DIR, { recursive: true });
  */
 function saveIcon(canvas, filename) {
   const buffer = canvas.toBuffer('image/png');
+  // @napi-rs/canvas returns a Buffer directly; canvas returns a Buffer too
   const outPath = join(ICONS_DIR, filename);
   writeFileSync(outPath, buffer);
   console.log(`Generated: ${outPath}`);
