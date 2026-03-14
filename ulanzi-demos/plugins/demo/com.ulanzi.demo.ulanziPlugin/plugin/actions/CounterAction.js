@@ -44,22 +44,22 @@ class CounterAction extends BaseAction {
     const s = state.settings;
     const value = s.value || 0;
 
-    const { canvas, ctx } = this.createCanvas(72, 72);
+    const { canvas, ctx } = this.createCanvas(196, 196);
     ctx.fillStyle = s.bgColor || '#1a1a2e';
-    ctx.fillRect(0, 0, 72, 72);
+    ctx.fillRect(0, 0, 196, 196);
 
     // Label
-    this.renderText(ctx, 'COUNTER', 36, 12, { font: '9px sans-serif', color: '#8b949e' });
+    this.renderText(ctx, 'COUNTER', 98, 32, { font: '22px sans-serif', color: '#8b949e' });
 
     // Value
     const valueColor = value > 0
       ? (s.incrementColor || '#39d353')
       : value < 0 ? (s.decrementColor || '#f85149') : '#8b949e';
-    this.renderText(ctx, String(value), 36, 38, { font: 'bold 26px monospace', color: valueColor });
+    this.renderText(ctx, String(value), 98, 106, { font: 'bold 68px monospace', color: valueColor });
 
     // Step hint
     const sign = s.direction === 'increment' ? '+' : '-';
-    this.renderText(ctx, `step: ${sign}${s.step}`, 36, 60, { font: '9px sans-serif', color: '#8b949e' });
+    this.renderText(ctx, `step: ${sign}${s.step}`, 98, 164, { font: '22px sans-serif', color: '#8b949e' });
 
     $UD.setBaseDataIcon(context, this.canvasToBase64(canvas), '');
   }

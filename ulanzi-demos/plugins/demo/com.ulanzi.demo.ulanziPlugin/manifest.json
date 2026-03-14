@@ -54,6 +54,26 @@
       "States": [
         { "Name": "status", "Image": "assets/icons/actionIcon.png" }
       ]
+    },
+    {
+      "Name": "Calendar",
+      "Tooltip": "Today's date in calendar style",
+      "UUID": "com.ulanzi.ulanzideck.demo.calendar",
+      "Icon": "assets/plugin-icon",
+      "PropertyInspectorPath": "property-inspector/calendar/inspector.html",
+      "States": [
+        { "Image": "assets/plugin-icon", "TitleAlignment": "middle", "FontSize": "14" }
+      ]
+    },
+    {
+      "Name": "Pomodoro",
+      "Tooltip": "Pomodoro work/break timer",
+      "UUID": "com.ulanzi.ulanzideck.demo.pomodoro",
+      "Icon": "assets/plugin-icon",
+      "PropertyInspectorPath": "property-inspector/pomodoro/inspector.html",
+      "States": [
+        { "Image": "assets/plugin-icon", "TitleAlignment": "middle", "FontSize": "14" }
+      ]
     }
   ]
 }

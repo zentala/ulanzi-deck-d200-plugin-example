@@ -8,9 +8,11 @@ const PLUGIN_UUID = 'com.ulanzi.demo';
 
 /** @type {Object.<string, BaseAction>} UUID → action instance */
 const ACTIONS = {
-  'com.ulanzi.demo.clock':   new ClockAction(),
-  'com.ulanzi.demo.counter': new CounterAction(),
-  'com.ulanzi.demo.status':  new StatusAction(),
+  'com.ulanzi.demo.clock':                        new ClockAction(),
+  'com.ulanzi.demo.counter':                      new CounterAction(),
+  'com.ulanzi.demo.status':                       new StatusAction(),
+  'com.ulanzi.ulanzideck.demo.calendar':          new CalendarAction(),
+  'com.ulanzi.ulanzideck.demo.pomodoro':          new PomodoroAction(),
 };
 
 /** @type {Object.<string, BaseAction>} context → action (for onClear routing) */

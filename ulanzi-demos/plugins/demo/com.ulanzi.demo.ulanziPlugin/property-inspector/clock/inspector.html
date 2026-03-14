@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   Property Inspector: Clock Action
-  Allows users to configure background color, text color, and display options.
+  Allows users to configure background color, text color, and date display.
 -->
 <html lang="en">
 <head>
@@ -33,13 +33,6 @@
 
   <div class="field">
     <div class="checkbox-row">
-      <input type="checkbox" id="showSeconds" checked />
-      <label for="showSeconds" style="margin:0">Show Seconds</label>
-    </div>
-  </div>
-
-  <div class="field">
-    <div class="checkbox-row">
       <input type="checkbox" id="showDate" checked />
       <label for="showDate" style="margin:0">Show Date</label>
     </div>
@@ -58,20 +51,17 @@
     $UD.onParamFromPlugin(jsn => {
       if (!jsn || !jsn.param) return;
       const p = jsn.param;
-      if (p.bgColor)    document.getElementById('bgColor').value    = p.bgColor;
-      if (p.textColor)  document.getElementById('textColor').value  = p.textColor;
-      if (p.showSeconds !== undefined)
-        document.getElementById('showSeconds').checked = p.showSeconds;
+      if (p.bgColor)   document.getElementById('bgColor').value   = p.bgColor;
+      if (p.textColor) document.getElementById('textColor').value = p.textColor;
       if (p.showDate !== undefined)
         document.getElementById('showDate').checked = p.showDate;
     });
 
     document.getElementById('btnSave').addEventListener('click', () => {
       $UD.sendParamFromPlugin({
-        bgColor:     document.getElementById('bgColor').value,
-        textColor:   document.getElementById('textColor').value,
-        showSeconds: document.getElementById('showSeconds').checked,
-        showDate:    document.getElementById('showDate').checked,
+        bgColor:   document.getElementById('bgColor').value,
+        textColor: document.getElementById('textColor').value,
+        showDate:  document.getElementById('showDate').checked,
       });
     });
   </script>

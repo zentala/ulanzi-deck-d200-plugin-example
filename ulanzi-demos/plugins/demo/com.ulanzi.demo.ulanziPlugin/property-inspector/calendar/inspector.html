@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<!--
+  Property Inspector: Calendar Action
+  No configurable settings — displays today's date automatically.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calendar Settings</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; font-size: 13px; color: #cdd9e5; background: #1c2128; padding: 12px; }
+    .note { color: #8b949e; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <p class="note">No settings needed. Displays today's date.</p>
+
+  <script src="../../plugin/libs/js/constants.js"></script>
+  <script src="../../plugin/libs/js/eventEmitter.js"></script>
+  <script src="../../plugin/libs/js/timers.js"></script>
+  <script src="../../plugin/libs/js/utils.js"></script>
+  <script src="../../plugin/libs/js/ulanzideckApi.js"></script>
+  <script>
+    $UD.connect('com.ulanzi.ulanzideck.demo.calendar');
+  </script>
+</body>
+</html>

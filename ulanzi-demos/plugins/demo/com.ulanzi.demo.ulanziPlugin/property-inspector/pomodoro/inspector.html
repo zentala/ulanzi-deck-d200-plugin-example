@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<!--
+  Property Inspector: Pomodoro Action
+  Configures work and break durations.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pomodoro Settings</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; font-size: 13px; color: #cdd9e5; background: #1c2128; padding: 12px; }
+    label { display: block; margin-bottom: 4px; color: #8b949e; }
+    .field { margin-bottom: 12px; }
+    input[type="range"] { width: 100%; }
+    .range-row { display: flex; align-items: center; gap: 8px; }
+    .range-value { min-width: 40px; text-align: right; color: #cdd9e5; }
+    button { width: 100%; padding: 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+    .btn-save { background: #238636; color: #fff; }
+    .btn-save:hover { background: #2ea043; }
+  </style>
+</head>
+<body>
+  <div class="field">
+    <label for="workMin">Work Duration (min)</label>
+    <div class="range-row">
+      <input type="range" id="workMin" min="1" max="60" step="1" value="25" />
+      <span class="range-value" id="workMinDisplay">25 min</span>
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="breakMin">Break Duration (min)</label>
+    <div class="range-row">
+      <input type="range" id="breakMin" min="1" max="30" step="1" value="5" />
+      <span class="range-value" id="breakMinDisplay">5 min</span>
+    </div>
+  </div>
+
+  <button class="btn-save" id="btnSave">Save</button>
+
+  <script src="../../plugin/libs/js/constants.js"></script>
+  <script src="../../plugin/libs/js/eventEmitter.js"></script>
+  <script src="../../plugin/libs/js/timers.js"></script>
+  <script src="../../plugin/libs/js/utils.js"></script>
+  <script src="../../plugin/libs/js/ulanzideckApi.js"></script>
+  <script>
+    $UD.connect('com.ulanzi.ulanzideck.demo.pomodoro');
+
+    const workInput      = document.getElementById('workMin');
+    const workDisplay    = document.getElementById('workMinDisplay');
+    const breakInput     = document.getElementById('breakMin');
+    const breakDisplay   = document.getElementById('breakMinDisplay');
+
+    workInput.addEventListener('input', () => {
+      workDisplay.textContent = `${workInput.value} min`;
+    });
+
+    breakInput.addEventListener('input', () => {
+      breakDisplay.textContent = `${breakInput.value} min`;
+    });
+
+    $UD.onParamFromPlugin(jsn => {
+      if (!jsn || !jsn.param) return;
+      const p = jsn.param;
+      if (p.workMin !== undefined) {
+        workInput.value         = p.workMin;
+        workDisplay.textContent = `${p.workMin} min`;
+      }
+      if (p.breakMin !== undefined) {
+        breakInput.value         = p.breakMin;
+        breakDisplay.textContent = `${p.breakMin} min`;
+      }
+    });
+
+    document.getElementById('btnSave').addEventListener('click', () => {
+      $UD.sendParamFromPlugin({
+        workMin:  parseInt(workInput.value, 10),
+        breakMin: parseInt(breakInput.value, 10),
+      });
+    });
+  </script>
+</body>
+</html>

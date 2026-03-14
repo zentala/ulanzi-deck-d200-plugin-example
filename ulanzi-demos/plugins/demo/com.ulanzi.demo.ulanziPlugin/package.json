@@ -1,0 +1,11 @@
+{
+  "name": "com.ulanzi.demo-plugin-tests",
+  "private": true,
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=tests/"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "jest-environment-jsdom": "^29.0.0"
+  }
+}
