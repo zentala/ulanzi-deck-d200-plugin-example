@@ -1,0 +1,20 @@
+{
+  "Clock": "Clock",
+  "Counter": "Counter",
+  "CPU Status": "CPU Status",
+  "Background Color": "Background Color",
+  "Text Color": "Text Color",
+  "Step": "Step",
+  "Direction": "Direction",
+  "Increment": "Increment",
+  "Decrement": "Decrement",
+  "Positive Color": "Positive Color",
+  "Negative Color": "Negative Color",
+  "Alert Threshold (%)": "Alert Threshold (%)",
+  "Update Interval (s)": "Update Interval (s)",
+  "Show Seconds": "Show Seconds",
+  "Show Date": "Show Date",
+  "Show Core Count": "Show Core Count",
+  "Save": "Save",
+  "Reset": "Reset"
+}

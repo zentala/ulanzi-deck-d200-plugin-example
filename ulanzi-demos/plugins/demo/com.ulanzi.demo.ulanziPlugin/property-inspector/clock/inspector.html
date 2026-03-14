@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!--
+  Property Inspector: Clock Action
+  Allows users to configure background color, text color, and display options.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Clock Settings</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; font-size: 13px; color: #cdd9e5; background: #1c2128; padding: 12px; }
+    label { display: block; margin-bottom: 4px; color: #8b949e; }
+    .field { margin-bottom: 12px; }
+    input[type="color"] { width: 100%; height: 32px; border: 1px solid #30363d; border-radius: 4px; background: #0d1117; cursor: pointer; padding: 2px; }
+    input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+    .checkbox-row { display: flex; align-items: center; gap: 8px; }
+    button { width: 100%; padding: 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+    .btn-save { background: #238636; color: #fff; }
+    .btn-save:hover { background: #2ea043; }
+  </style>
+</head>
+<body>
+  <div class="field">
+    <label for="bgColor">Background Color</label>
+    <input type="color" id="bgColor" value="#0d1117" />
+  </div>
+
+  <div class="field">
+    <label for="textColor">Text Color</label>
+    <input type="color" id="textColor" value="#ffffff" />
+  </div>
+
+  <div class="field">
+    <div class="checkbox-row">
+      <input type="checkbox" id="showSeconds" checked />
+      <label for="showSeconds" style="margin:0">Show Seconds</label>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="checkbox-row">
+      <input type="checkbox" id="showDate" checked />
+      <label for="showDate" style="margin:0">Show Date</label>
+    </div>
+  </div>
+
+  <button class="btn-save" id="btnSave">Save</button>
+
+  <script src="../../libs/plugin-common-html/index.js"></script>
+  <script>
+    const api = window.$PI;
+
+    /** Populate form from received settings. */
+    api.onDidReceiveSettings((_actionUUID, _context, settings) => {
+      if (!settings) return;
+      if (settings.bgColor)    document.getElementById('bgColor').value    = settings.bgColor;
+      if (settings.textColor)  document.getElementById('textColor').value  = settings.textColor;
+      if (settings.showSeconds !== undefined)
+        document.getElementById('showSeconds').checked = settings.showSeconds;
+      if (settings.showDate !== undefined)
+        document.getElementById('showDate').checked = settings.showDate;
+    });
+
+    document.getElementById('btnSave').addEventListener('click', () => {
+      const payload = {
+        bgColor:     document.getElementById('bgColor').value,
+        textColor:   document.getElementById('textColor').value,
+        showSeconds: document.getElementById('showSeconds').checked,
+        showDate:    document.getElementById('showDate').checked,
+      };
+      api.sendToPlugin(payload);
+    });
+  </script>
+</body>
+</html>

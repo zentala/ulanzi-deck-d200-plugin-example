@@ -1,0 +1,41 @@
+{
+  "Name": "Ulanzi Demo",
+  "Author": "ulanzi-demos",
+  "Version": "1.0.0",
+  "Description": "Reference demo plugin: clock, counter, CPU status",
+  "UUID": "com.ulanzi.demo",
+  "CodeType": "JavaScript",
+  "MinSoftwareVersion": "6.1",
+  "CodePath": "plugin/app.html",
+  "UsePrivateApi": true,
+  "OS": [
+    { "Platform": "windows", "MinimumVersion": "10" },
+    { "Platform": "mac", "MinimumVersion": "10.11" }
+  ],
+  "Actions": [
+    {
+      "Name": "Clock",
+      "UUID": "com.ulanzi.demo.clock",
+      "Tooltip": "Digital clock updated every second",
+      "Icon": "assets/clock-action",
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "property-inspector/clock/inspector.html"
+    },
+    {
+      "Name": "Counter",
+      "UUID": "com.ulanzi.demo.counter",
+      "Tooltip": "Tap to increment/decrement. Hold to reset.",
+      "Icon": "assets/counter-action",
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "property-inspector/counter/inspector.html"
+    },
+    {
+      "Name": "CPU Status",
+      "UUID": "com.ulanzi.demo.status",
+      "Tooltip": "CPU usage monitor with threshold alert",
+      "Icon": "assets/status-action",
+      "SupportedInMultiActions": false,
+      "PropertyInspectorPath": "property-inspector/status/inspector.html"
+    }
+  ]
+}
