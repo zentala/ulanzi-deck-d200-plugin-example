@@ -8,6 +8,19 @@
 
 import { BaseAction } from './BaseAction.js';
 
+/**
+ * Resolve the Node.js `os` module in the UlanziStudio plugin context.
+ * UsePrivateApi may expose it as _os, global.os, or via require('os').
+ * @returns {object | null}
+ */
+function resolveOsModule() {
+  if (typeof window !== 'undefined' && _os?.cpus) return _os;
+  if (typeof global !== 'undefined' && global.os?.cpus) return global.os;
+  try { return require('os'); } catch (_) { return null; }
+}
+
+const _os = resolveOsModule();
+
 /** @type {{ alertThreshold: number, intervalSec: number, showCores: boolean }} */
 const DEFAULT_SETTINGS = {
   alertThreshold: 80,
@@ -64,7 +77,7 @@ export class StatusAction extends BaseAction {
     const settings = { ...DEFAULT_SETTINGS, ...state.settings };
 
     const usage = this._measureCpuUsage(context);
-    const coreCount = (window.os && window.os.cpus) ? window.os.cpus().length : 0;
+    const coreCount = (_os && _os.cpus) ? _os.cpus().length : 0;
 
     // Threshold-based color
     let color;
@@ -131,9 +144,9 @@ export class StatusAction extends BaseAction {
    * @returns {number}
    */
   _measureCpuUsage(context) {
-    if (!window.os || !window.os.cpus) return 0;
+    if (!_os || !_os.cpus) return 0;
 
-    const cores = window.os.cpus();
+    const cores = _os.cpus();
     let idle = 0;
     let total = 0;
     for (const core of cores) {

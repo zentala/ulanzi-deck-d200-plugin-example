@@ -31,6 +31,8 @@ def pil_to_rgb565(img: Image.Image) -> bytes:
     """Convert a PIL RGB image to packed little-endian RGB565 bytes.
 
     Each pixel is encoded as a 16-bit value: RRRRRGGGGGGBBBBB (LE).
+    Uses numpy for fast vectorised conversion when available (~10-20x faster),
+    falls back to pure Python otherwise.
 
     Args:
         img: Source image in RGB mode.
@@ -39,15 +41,21 @@ def pil_to_rgb565(img: Image.Image) -> bytes:
         Raw bytes suitable for writing to a 16-bpp framebuffer.
     """
     rgb = img.convert("RGB")
-    pixels = list(rgb.getdata())
-    buf = bytearray(len(pixels) * 2)
-    for i, (r, g, b) in enumerate(pixels):
-        r5 = (r >> 3) & 0x1F
-        g6 = (g >> 2) & 0x3F
-        b5 = (b >> 3) & 0x1F
-        word = (r5 << 11) | (g6 << 5) | b5
-        struct.pack_into("<H", buf, i * 2, word)
-    return bytes(buf)
+    try:
+        import numpy as np  # optional fast path
+        arr = np.array(rgb, dtype=np.uint16)
+        r5 = (arr[:, :, 0] >> 3).astype(np.uint16)
+        g6 = (arr[:, :, 1] >> 2).astype(np.uint16)
+        b5 = (arr[:, :, 2] >> 3).astype(np.uint16)
+        packed = ((r5 << 11) | (g6 << 5) | b5).astype("<u2")
+        return packed.tobytes()
+    except ImportError:
+        pixels = list(rgb.getdata())
+        buf = bytearray(len(pixels) * 2)
+        for i, (r, g, b) in enumerate(pixels):
+            word = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3)
+            struct.pack_into("<H", buf, i * 2, word)
+        return bytes(buf)
 
 
 def pil_to_rgba8888(img: Image.Image) -> bytes:
