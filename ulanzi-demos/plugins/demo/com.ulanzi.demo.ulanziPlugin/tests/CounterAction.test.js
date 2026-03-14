@@ -58,6 +58,27 @@ describe('CounterAction – render', () => {
   });
 });
 
+describe('CounterAction – handleParams', () => {
+  test('merges new settings into _buttons[ctx].settings', () => {
+    const action = makeAction({ step: 1 });
+    action.handleParams(makeJsn(CTX, '', { step: 5 }));
+    expect(action._buttons[CTX].settings.step).toBe(5);
+  });
+
+  test('action=reset zeroes value and calls sendParamFromPlugin', () => {
+    const action = makeAction({ value: 42, step: 1 });
+    action.handleParams(makeJsn(CTX, '', { action: 'reset' }));
+    expect(action._buttons[CTX].settings.value).toBe(0);
+    expect(sandbox.$UD.sendParamFromPlugin).toHaveBeenCalledWith({ value: 0 }, CTX);
+  });
+
+  test('re-renders after param update', () => {
+    const action = makeAction({ step: 1 });
+    action.handleParams(makeJsn(CTX, '', { step: 3 }));
+    expect(patch.getLastCanvas().texts()).toContain('step: +3');
+  });
+});
+
 describe('CounterAction – press', () => {
   test('onPress increments value and re-renders', () => {
     const action = makeAction({ step: 1, direction: 'increment', value: 0 });

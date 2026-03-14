@@ -320,7 +320,29 @@ describe('onPress', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 7. handleClear – Worker lifecycle
+// 7. onSetActive
+// ---------------------------------------------------------------------------
+
+describe('onSetActive', () => {
+  test('active: false clears a running interval', () => {
+    const { action, context } = makeAction();
+    // Plant a real interval to simulate a running poll cycle
+    action._buttons[context].intervalId = setInterval(() => {}, 9999);
+    action.handleSetActive({ context, active: false });
+    expect(action._buttons[context].intervalId).toBeNull();
+  });
+
+  test('active: true starts interval and renders', () => {
+    const { action, context } = makeAction();
+    action.handleSetActive({ context, active: true });
+    expect(action._buttons[context].intervalId).not.toBeNull();
+    expect(sandbox.$UD.setBaseDataIcon).toHaveBeenCalledWith(context, expect.any(String), '');
+    action.handleClear(context); // cleanup interval
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 8. handleClear – Worker lifecycle
 // ---------------------------------------------------------------------------
 
 describe('handleClear – Worker termination', () => {

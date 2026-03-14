@@ -100,6 +100,24 @@ describe('CalendarAction – press', () => {
   });
 });
 
+describe('CalendarAction – lifecycle', () => {
+  test('onSetActive false stops the interval', () => {
+    const action = makeAction();
+    expect(action._buttons[CTX].intervalId).not.toBeNull();
+    action.handleSetActive({ context: CTX, active: false });
+    expect(action._buttons[CTX].intervalId).toBeNull();
+  });
+
+  test('onSetActive true restarts interval and re-renders', () => {
+    const action = makeAction();
+    action.handleSetActive({ context: CTX, active: false });
+    sandbox.$UD.setBaseDataIcon.mockClear();
+    action.handleSetActive({ context: CTX, active: true });
+    expect(action._buttons[CTX].intervalId).not.toBeNull();
+    expect(sandbox.$UD.setBaseDataIcon).toHaveBeenCalled();
+  });
+});
+
 describe('CalendarAction – interval', () => {
   test('interval is started on init (intervalId is set)', () => {
     const action = makeAction();
