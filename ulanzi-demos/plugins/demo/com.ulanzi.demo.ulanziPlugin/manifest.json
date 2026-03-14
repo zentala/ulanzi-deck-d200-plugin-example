@@ -2,12 +2,18 @@
   "Name": "Ulanzi Demo",
   "Author": "ulanzi-demos",
   "Version": "1.0.0",
-  "Description": "Reference demo plugin: clock, counter, CPU status",
+  "Description": "Demo plugin: clock, counter, CPU status",
+  "Icon": "assets/icons/icon.png",
+  "Category": "Ulanzi Demo",
+  "CategoryIcon": "assets/icons/categoryIcon.png",
   "UUID": "com.ulanzi.demo",
-  "CodeType": "JavaScript",
-  "MinSoftwareVersion": "6.1",
+  "Type": "JavaScript",
   "CodePath": "plugin/app.html",
-  "UsePrivateApi": true,
+  "PrivateAPI": true,
+  "SupportedInMultiActions": false,
+  "Software": {
+    "MinimumVersion": "6.1"
+  },
   "OS": [
     { "Platform": "windows", "MinimumVersion": "10" },
     { "Platform": "mac", "MinimumVersion": "10.11" }
@@ -17,25 +23,37 @@
       "Name": "Clock",
       "UUID": "com.ulanzi.demo.clock",
       "Tooltip": "Digital clock updated every second",
-      "Icon": "assets/clock-action",
+      "Icon": "assets/icons/actionIcon.png",
+      "PropertyInspectorPath": "property-inspector/clock/inspector.html",
       "SupportedInMultiActions": false,
-      "PropertyInspectorPath": "property-inspector/clock/inspector.html"
+      "state": 0,
+      "States": [
+        { "Name": "clock", "Image": "assets/icons/actionIcon.png" }
+      ]
     },
     {
       "Name": "Counter",
       "UUID": "com.ulanzi.demo.counter",
-      "Tooltip": "Tap to increment/decrement. Hold to reset.",
-      "Icon": "assets/counter-action",
+      "Tooltip": "Tap to increment. Hold to reset.",
+      "Icon": "assets/icons/actionIcon.png",
+      "PropertyInspectorPath": "property-inspector/counter/inspector.html",
       "SupportedInMultiActions": false,
-      "PropertyInspectorPath": "property-inspector/counter/inspector.html"
+      "state": 0,
+      "States": [
+        { "Name": "counter", "Image": "assets/icons/actionIcon.png" }
+      ]
     },
     {
       "Name": "CPU Status",
       "UUID": "com.ulanzi.demo.status",
-      "Tooltip": "CPU usage monitor with threshold alert",
-      "Icon": "assets/status-action",
+      "Tooltip": "CPU usage monitor with alert",
+      "Icon": "assets/icons/actionIcon.png",
+      "PropertyInspectorPath": "property-inspector/status/inspector.html",
       "SupportedInMultiActions": false,
-      "PropertyInspectorPath": "property-inspector/status/inspector.html"
+      "state": 0,
+      "States": [
+        { "Name": "status", "Image": "assets/icons/actionIcon.png" }
+      ]
     }
   ]
 }
