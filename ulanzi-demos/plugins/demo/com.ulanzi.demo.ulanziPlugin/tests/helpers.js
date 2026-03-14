@@ -73,6 +73,7 @@ function createSandbox(actionFiles, exportNames) {
       toast: jest.fn(),
       setBaseDataIcon: jest.fn(),
       sendParamFromPlugin: jest.fn(),
+      openUrl: jest.fn(),
     },
     console,
     setTimeout,

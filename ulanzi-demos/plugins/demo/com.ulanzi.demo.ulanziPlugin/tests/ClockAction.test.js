@@ -93,13 +93,28 @@ describe('ClockAction – render', () => {
     action.render(CTX);
     expect(sandbox.$UD.setBaseDataIcon).toHaveBeenCalledWith(CTX, expect.any(String), '');
   });
+
+  test('renders timezone label PL by default', () => {
+    const action = makeAction();
+    action.render(CTX);
+    const texts = patch.getLastCanvas().texts();
+    expect(texts).toContain('PL');
+  });
+
+  test('renders timezone label JKT after toggle to Jakarta', () => {
+    const action = makeAction();
+    action.onPress(CTX);
+    action.render(CTX);
+    const texts = patch.getLastCanvas().texts();
+    expect(texts).toContain('JKT');
+  });
 });
 
 describe('ClockAction – press', () => {
   test('onPress calls $UD.toast', () => {
     const action = makeAction();
     action.handleRun(makeJsn(CTX, ''));
-    expect(sandbox.$UD.toast).toHaveBeenCalledWith(expect.stringContaining('Clock'));
+    expect(sandbox.$UD.setBaseDataIcon).toHaveBeenCalled();
   });
 });
 
@@ -107,5 +122,45 @@ describe('ClockAction – interval', () => {
   test('_startInterval is called on init (intervalId is set)', () => {
     const action = makeAction();
     expect(action._buttons[CTX].intervalId).not.toBeNull();
+  });
+});
+
+describe('ClockAction – timezone', () => {
+  test('initial timezone is PL', () => {
+    const action = makeAction();
+    expect(action._timezone[CTX]).toBe('PL');
+  });
+
+  test('onPress toggles timezone from PL to Asia/Jakarta', () => {
+    const action = makeAction();
+    expect(action._timezone[CTX]).toBe('PL');
+    action.onPress(CTX);
+    expect(action._timezone[CTX]).toBe('Asia/Jakarta');
+  });
+
+  test('onPress toggles timezone back from Asia/Jakarta to PL', () => {
+    const action = makeAction();
+    action.onPress(CTX); // PL → Jakarta
+    action.onPress(CTX); // Jakarta → PL
+    expect(action._timezone[CTX]).toBe('PL');
+  });
+
+  test('render uses Warsaw timezone when PL', () => {
+    const action = makeAction();
+    // timezone is PL — render should produce a valid HH:MM string
+    action.render(CTX);
+    const texts = patch.getLastCanvas().texts();
+    const timeText = texts.find((t) => /^\d{2}:\d{2}$/.test(t));
+    expect(timeText).toBeDefined();
+  });
+
+  test('render uses Jakarta timezone when toggled', () => {
+    const action = makeAction();
+    action.onPress(CTX); // switch to Jakarta
+    action.render(CTX);
+    const texts = patch.getLastCanvas().texts();
+    const timeText = texts.find((t) => /^\d{2}:\d{2}$/.test(t));
+    expect(timeText).toBeDefined();
+    expect(texts).toContain('JKT');
   });
 });

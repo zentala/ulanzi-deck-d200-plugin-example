@@ -74,31 +74,16 @@ describe('CalendarAction – render', () => {
 });
 
 describe('CalendarAction – press', () => {
-  test('onPress calls $UD.toast with full date string', () => {
+  test('onPress opens Google Calendar URL', () => {
     const action = makeAction();
     action.handleRun(makeJsn(CTX, ''));
-    expect(sandbox.$UD.toast).toHaveBeenCalledWith(expect.stringMatching(/\d{4}/));
+    expect(sandbox.$UD.openUrl).toHaveBeenCalledWith('https://calendar.google.com');
   });
 
-  test('toast includes full month name', () => {
+  test('onPress does not call toast', () => {
     const action = makeAction();
     action.handleRun(makeJsn(CTX, ''));
-    const fullMonths = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-    const call = sandbox.$UD.toast.mock.calls[0][0];
-    expect(fullMonths.some((m) => call.includes(m))).toBe(true);
+    expect(sandbox.$UD.toast).not.toHaveBeenCalled();
   });
 });
 
