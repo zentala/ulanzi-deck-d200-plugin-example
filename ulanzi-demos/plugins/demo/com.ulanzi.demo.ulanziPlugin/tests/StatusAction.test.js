@@ -294,7 +294,33 @@ describe('render – what appears on screen', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 6. handleClear – Worker lifecycle
+// 6. onPress – alert reset and re-render
+// ---------------------------------------------------------------------------
+
+describe('onPress', () => {
+  test('resets alert flags so toast can fire again after manual refresh', () => {
+    const { action, context } = makeAction({ cpuThreshold: 90 });
+    action._cpu[context] = 95;
+    action._alerted[context] = { cpu: true, temp: true }; // alerts already fired
+
+    action.onPress(context);
+
+    expect(action._alerted[context]).toEqual({ cpu: false, temp: false });
+  });
+
+  test('calls render after press', () => {
+    const { action, context } = makeAction();
+    action._cpu[context] = 50;
+    action._temp[context] = 60;
+
+    action.onPress(context);
+
+    expect(sandbox.$UD.setBaseDataIcon).toHaveBeenCalledWith(context, expect.any(String), '');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 7. handleClear – Worker lifecycle
 // ---------------------------------------------------------------------------
 
 describe('handleClear – Worker termination', () => {

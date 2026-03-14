@@ -21,16 +21,24 @@ function makeAction(settings = {}) {
 let patch;
 
 beforeEach(() => {
+  jest.useFakeTimers();
+  // Sync sandbox timer refs so the vm context picks up Jest's fake timers
+  sandbox.setInterval = global.setInterval;
+  sandbox.clearInterval = global.clearInterval;
+  sandbox.setTimeout = global.setTimeout;
+  sandbox.clearTimeout = global.clearTimeout;
   jest.clearAllMocks();
   patch = patchCreateCanvas(BaseAction);
-  // Use fake timers so intervals don't actually fire during tests
-  jest.useFakeTimers();
 });
 
 afterEach(() => {
   if (action) action.handleClear(CTX);
   patch.restore();
   jest.useRealTimers();
+  sandbox.setInterval = global.setInterval;
+  sandbox.clearInterval = global.clearInterval;
+  sandbox.setTimeout = global.setTimeout;
+  sandbox.clearTimeout = global.clearTimeout;
 });
 
 // ---------------------------------------------------------------------------

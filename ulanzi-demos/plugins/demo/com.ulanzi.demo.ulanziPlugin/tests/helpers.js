@@ -63,6 +63,15 @@ const fetch  = () => Promise.reject(new Error('fetch not available'));
 /**
  * Create a vm sandbox with jest mocks for $UD and load the given action files.
  *
+ * NOTE: BaseAction.js is always loaded first (all actions extend it). Include
+ * 'BaseAction' in exportNames if you need direct access to the class (e.g. for
+ * patchCreateCanvas).
+ *
+ * Timer globals (setInterval, clearInterval, setTimeout, clearTimeout) are
+ * captured at call time. To use jest.useFakeTimers() effectively, call it
+ * BEFORE createSandbox, or re-sync the sandbox properties in beforeEach:
+ *   sandbox.setInterval = global.setInterval; // etc.
+ *
  * @param {string[]} actionFiles - relative paths inside plugin/actions/ to load (after BaseAction)
  * @param {string[]} exportNames - class names to extract from the sandbox
  * @returns {{ sandbox: object, classes: object }}
