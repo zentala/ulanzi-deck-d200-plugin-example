@@ -10,6 +10,7 @@
  *
  * Settings: workMin (default 25), breakMin (default 5)
  */
+// eslint-disable-next-line no-unused-vars
 class PomodoroAction extends BaseAction {
   constructor() {
     super();
@@ -71,7 +72,7 @@ class PomodoroAction extends BaseAction {
     }
   }
 
-  onSettings(context, params) {
+  onSettings(context, _params) {
     // If idle, just re-render so preview reflects new durations
     const ps = this._state[context];
     if (ps && ps.state === 'idle') this.render(context);

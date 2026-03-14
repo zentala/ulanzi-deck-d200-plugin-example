@@ -15,6 +15,7 @@
  *   CPU  > cpuThreshold  (default 90%) → orange/red + toast
  *   Temp > tempThreshold (default 85°C) → red + urgent toast
  */
+// eslint-disable-next-line no-unused-vars
 class StatusAction extends BaseAction {
   constructor() {
     super();
@@ -60,7 +61,7 @@ class StatusAction extends BaseAction {
         this._onCpuSample(e.data);
       };
       return worker;
-    } catch (_) {
+    } catch {
       return null;
     }
   }

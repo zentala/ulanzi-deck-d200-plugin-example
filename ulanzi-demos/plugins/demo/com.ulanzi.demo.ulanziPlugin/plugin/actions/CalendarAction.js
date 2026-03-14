@@ -3,6 +3,7 @@
  * @description Torn-off calendar style action. Displays current day, month
  * name, year, and day-of-week. Refreshes at midnight (polls every 60s).
  */
+// eslint-disable-next-line no-unused-vars
 class CalendarAction extends BaseAction {
   _defaultSettings() {
     return {};
@@ -35,7 +36,7 @@ class CalendarAction extends BaseAction {
     }
   }
 
-  onPress(context) {
+  onPress(_context) {
     $UD.openUrl('https://calendar.google.com');
   }
 

@@ -3,6 +3,7 @@
  * @description Abstract base for demo plugin actions.
  * Manages lifecycle, canvas utilities, and settings via sendParamFromPlugin.
  */
+// eslint-disable-next-line no-unused-vars
 class BaseAction {
   constructor() {
     /** @type {Object.<string, {settings: object, intervalId: number|null}>} */
@@ -111,19 +112,19 @@ class BaseAction {
   _defaultSettings() {
     return {};
   }
-  onInit(context) {
+  onInit(_context) {
     /* override */
   }
-  onPress(context) {
+  onPress(_context) {
     /* override */
   }
-  onSetActive(context, active) {
+  onSetActive(_context, _active) {
     /* override */
   }
-  onSettings(context, params) {
+  onSettings(_context, _params) {
     /* override */
   }
-  render(context) {
+  render(_context) {
     /* override */
   }
 }

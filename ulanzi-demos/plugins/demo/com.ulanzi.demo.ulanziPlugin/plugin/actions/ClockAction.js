@@ -5,6 +5,7 @@
  * Updates every second via setInterval. Press to toggle timezone between
  * Warsaw (PL) and Jakarta (JKT).
  */
+// eslint-disable-next-line no-unused-vars
 class ClockAction extends BaseAction {
   constructor() {
     super();
@@ -36,7 +37,7 @@ class ClockAction extends BaseAction {
     this.render(context);
   }
 
-  onSettings(context, params) {
+  onSettings(context, _params) {
     this.render(context);
   }
 

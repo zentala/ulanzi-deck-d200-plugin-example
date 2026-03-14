@@ -3,6 +3,7 @@
  * @description Tap-to-count action with configurable step, direction, and colors.
  * Settings are persisted via sendParamFromPlugin.
  */
+// eslint-disable-next-line no-unused-vars
 class CounterAction extends BaseAction {
   _defaultSettings() {
     return {
