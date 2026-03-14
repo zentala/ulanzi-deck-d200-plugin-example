@@ -68,7 +68,7 @@ class BaseAction {
    * @param {{ font?: string, color?: string, align?: CanvasTextAlign }} [opts]
    */
   renderText(ctx, text, x, y, opts = {}) {
-    ctx.font      = opts.font  || '14px sans-serif';
+    ctx.font = opts.font || '14px sans-serif';
     ctx.fillStyle = opts.color || '#ffffff';
     ctx.textAlign = opts.align || 'center';
     ctx.textBaseline = 'middle';
@@ -108,10 +108,22 @@ class BaseAction {
   }
 
   // --- Abstract (must override) ---
-  _defaultSettings() { return {}; }
-  onInit(context)            { /* override */ }
-  onPress(context)           { /* override */ }
-  onSetActive(context, active) { /* override */ }
-  onSettings(context, params)  { /* override */ }
-  render(context)            { /* override */ }
+  _defaultSettings() {
+    return {};
+  }
+  onInit(context) {
+    /* override */
+  }
+  onPress(context) {
+    /* override */
+  }
+  onSetActive(context, active) {
+    /* override */
+  }
+  onSettings(context, params) {
+    /* override */
+  }
+  render(context) {
+    /* override */
+  }
 }

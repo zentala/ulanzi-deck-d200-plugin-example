@@ -8,11 +8,11 @@ const PLUGIN_UUID = 'com.ulanzi.demo';
 
 /** @type {Object.<string, BaseAction>} UUID → action instance */
 const ACTIONS = {
-  'com.ulanzi.demo.clock':                        new ClockAction(),
-  'com.ulanzi.demo.counter':                      new CounterAction(),
-  'com.ulanzi.demo.status':                       new StatusAction(),
-  'com.ulanzi.ulanzideck.demo.calendar':          new CalendarAction(),
-  'com.ulanzi.ulanzideck.demo.pomodoro':          new PomodoroAction(),
+  'com.ulanzi.demo.clock': new ClockAction(),
+  'com.ulanzi.demo.counter': new CounterAction(),
+  'com.ulanzi.demo.status': new StatusAction(),
+  'com.ulanzi.ulanzideck.demo.calendar': new CalendarAction(),
+  'com.ulanzi.ulanzideck.demo.pomodoro': new PomodoroAction(),
 };
 
 /** @type {Object.<string, BaseAction>} context → action (for onClear routing) */
@@ -30,17 +30,17 @@ $UD.onConnected(() => {
   $UD.toast('Demo Plugin loaded');
 });
 
-$UD.onAdd(jsn => {
+$UD.onAdd((jsn) => {
   CONTEXT_MAP[jsn.context] = ACTIONS[jsn.action];
   dispatch(jsn, 'handleAdd');
 });
 
-$UD.onRun(jsn         => dispatch(jsn, 'handleRun'));
-$UD.onSetActive(jsn   => dispatch(jsn, 'handleSetActive'));
-$UD.onParamFromApp(jsn => dispatch(jsn, 'handleParams'));
-$UD.onParamFromPlugin(jsn => dispatch(jsn, 'handleParams'));
+$UD.onRun((jsn) => dispatch(jsn, 'handleRun'));
+$UD.onSetActive((jsn) => dispatch(jsn, 'handleSetActive'));
+$UD.onParamFromApp((jsn) => dispatch(jsn, 'handleParams'));
+$UD.onParamFromPlugin((jsn) => dispatch(jsn, 'handleParams'));
 
-$UD.onClear(jsn => {
+$UD.onClear((jsn) => {
   if (!jsn.param) return;
   for (const item of jsn.param) {
     const context = item.context;

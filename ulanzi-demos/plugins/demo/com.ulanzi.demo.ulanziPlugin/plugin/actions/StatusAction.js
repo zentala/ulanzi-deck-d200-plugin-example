@@ -19,7 +19,7 @@ class StatusAction extends BaseAction {
   constructor() {
     super();
     /** @type {Object.<string, number|null>} */
-    this._cpu  = {};
+    this._cpu = {};
     /** @type {Object.<string, number|null>} */
     this._temp = {};
     /** @type {Object.<string, {cpu:boolean,temp:boolean}>} */
@@ -53,7 +53,7 @@ class StatusAction extends BaseAction {
           postMessage(load);
         }, 2000);
       `;
-      const blob   = new Blob([code], { type: 'application/javascript' });
+      const blob = new Blob([code], { type: 'application/javascript' });
       const worker = new Worker(URL.createObjectURL(blob));
       worker.onmessage = (e) => {
         if (this._lhmAvailable) return; // LHM is running, ignore worker data
@@ -83,11 +83,11 @@ class StatusAction extends BaseAction {
     const port = state.settings.lhmPort || 8085;
 
     fetch(`http://localhost:${port}/data.json`)
-      .then(r => r.json())
-      .then(data => {
+      .then((r) => r.json())
+      .then((data) => {
         this._lhmAvailable = true;
         const { load, temp } = this._scanLHM(data);
-        if (load !== null) this._cpu[context]  = this._smooth(this._cpu[context],  load);
+        if (load !== null) this._cpu[context] = this._smooth(this._cpu[context], load);
         if (temp !== null) this._temp[context] = this._smooth(this._temp[context], temp);
         this._checkAlerts(context);
         this.render(context);
@@ -112,7 +112,7 @@ class StatusAction extends BaseAction {
     if (!node) return acc;
 
     const text = (node.Text || '').toLowerCase();
-    const val  = node.Value || '';
+    const val = node.Value || '';
 
     if (acc.load === null && val.includes('%') && !val.includes('°')) {
       if (text === 'cpu total' || text.includes('cpu total')) {
@@ -122,8 +122,12 @@ class StatusAction extends BaseAction {
     }
 
     if (acc.temp === null && val.includes('°')) {
-      if (text.includes('package') || text.includes('tdie') ||
-          text === 'cpu' || text === 'cpu temp') {
+      if (
+        text.includes('package') ||
+        text.includes('tdie') ||
+        text === 'cpu' ||
+        text === 'cpu temp'
+      ) {
         const n = parseFloat(val);
         if (!isNaN(n)) acc.temp = n;
       }
@@ -162,11 +166,11 @@ class StatusAction extends BaseAction {
   _checkAlerts(context) {
     const state = this._buttons[context];
     if (!state) return;
-    const s  = state.settings;
+    const s = state.settings;
     const al = this._alerted[context] || { cpu: false, temp: false };
 
     const temp = this._temp[context];
-    const cpu  = this._cpu[context];
+    const cpu = this._cpu[context];
 
     if (temp !== null && temp >= (s.tempThreshold || 85)) {
       if (!al.temp) {
@@ -198,8 +202,8 @@ class StatusAction extends BaseAction {
   }
 
   onInit(context) {
-    this._cpu[context]     = null;
-    this._temp[context]    = null;
+    this._cpu[context] = null;
+    this._temp[context] = null;
     this._alerted[context] = { cpu: false, temp: false };
     this._restartInterval(context);
   }
@@ -242,10 +246,10 @@ class StatusAction extends BaseAction {
   render(context) {
     const state = this._buttons[context];
     if (!state) return;
-    const s    = state.settings;
-    const cpu  = this._cpu[context];
+    const s = state.settings;
+    const cpu = this._cpu[context];
     const temp = this._temp[context];
-    const al   = this._alerted[context] || {};
+    const al = this._alerted[context] || {};
 
     const { canvas, ctx } = this.createCanvas(196, 196);
 
@@ -261,14 +265,14 @@ class StatusAction extends BaseAction {
 
     // CPU section (top half)
     this._renderSection(ctx, {
-      label:    'CPU',
-      value:    cpu  !== null ? `${cpu}%`              : '—',
-      hint:     cpu  !== null ? null                   : (this._lhmAvailable ? null : 'no data'),
+      label: 'CPU',
+      value: cpu !== null ? `${cpu}%` : '—',
+      hint: cpu !== null ? null : this._lhmAvailable ? null : 'no data',
       barValue: cpu,
-      barMax:   100,
-      color:    this._sectionColor(cpu,  s.cpuThreshold  || 90),
-      y0:       8,
-      height:   86,
+      barMax: 100,
+      color: this._sectionColor(cpu, s.cpuThreshold || 90),
+      y0: 8,
+      height: 86,
     });
 
     // Divider
@@ -277,14 +281,14 @@ class StatusAction extends BaseAction {
 
     // TEMP section (bottom half)
     this._renderSection(ctx, {
-      label:    'TEMP',
-      value:    temp !== null ? `${temp.toFixed(0)}\u00B0C` : '—',
-      hint:     temp !== null ? null                        : 'install LHM',
+      label: 'TEMP',
+      value: temp !== null ? `${temp.toFixed(0)}\u00B0C` : '—',
+      hint: temp !== null ? null : 'install LHM',
       barValue: temp,
-      barMax:   110,
-      color:    this._sectionColor(temp, s.tempThreshold || 85),
-      y0:       102,
-      height:   86,
+      barMax: 110,
+      color: this._sectionColor(temp, s.tempThreshold || 85),
+      y0: 102,
+      height: 86,
     });
 
     $UD.setBaseDataIcon(context, this.canvasToBase64(canvas), '');
@@ -292,14 +296,18 @@ class StatusAction extends BaseAction {
 
   _renderSection(ctx, { label, value, hint, barValue, barMax, color, y0, height }) {
     this.renderText(ctx, label, 14, y0 + 14, {
-      font: '18px sans-serif', color: 'rgba(255,255,255,0.45)', align: 'left',
+      font: '18px sans-serif',
+      color: 'rgba(255,255,255,0.45)',
+      align: 'left',
     });
     this.renderText(ctx, value, 98, y0 + 48, {
-      font: 'bold 46px monospace', color: '#ffffff',
+      font: 'bold 46px monospace',
+      color: '#ffffff',
     });
     if (hint) {
       this.renderText(ctx, hint, 98, y0 + 72, {
-        font: '16px sans-serif', color: 'rgba(255,255,255,0.3)',
+        font: '16px sans-serif',
+        color: 'rgba(255,255,255,0.3)',
       });
     }
     if (barValue !== null) {
@@ -313,9 +321,9 @@ class StatusAction extends BaseAction {
    * @returns {string} hex colour
    */
   _sectionColor(value, threshold) {
-    if (value === null)                    return '#444';
-    if (value >= threshold)                return '#f85149'; // red
-    if (value >= threshold * 0.75)         return '#ffaa00'; // orange
-    return '#39d353';                                        // green
+    if (value === null) return '#444';
+    if (value >= threshold) return '#f85149'; // red
+    if (value >= threshold * 0.75) return '#ffaa00'; // orange
+    return '#39d353'; // green
   }
 }

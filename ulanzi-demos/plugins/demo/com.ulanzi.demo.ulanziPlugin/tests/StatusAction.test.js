@@ -20,21 +20,27 @@ function makeCanvas() {
   const calls = [];
   const ctx = {
     calls,
-    fillStyle: '', strokeStyle: '', lineWidth: 0,
-    font: '', textAlign: 'center', textBaseline: 'middle',
-    fillRect:   (...a) => calls.push({ op: 'fillRect', args: a }),
+    fillStyle: '',
+    strokeStyle: '',
+    lineWidth: 0,
+    font: '',
+    textAlign: 'center',
+    textBaseline: 'middle',
+    fillRect: (...a) => calls.push({ op: 'fillRect', args: a }),
     strokeRect: (...a) => calls.push({ op: 'strokeRect', args: a }),
-    fillText:   (text, x, y) => calls.push({ op: 'fillText', text, x, y }),
+    fillText: (text, x, y) => calls.push({ op: 'fillText', text, x, y }),
     createLinearGradient: () => ({ addColorStop: () => {} }),
   };
   return {
     canvas: {
-      width: 196, height: 196,
+      width: 196,
+      height: 196,
       getContext: () => ctx,
       toDataURL: () => 'data:image/png;base64,MOCK',
     },
-    ctx, calls,
-    texts: () => calls.filter(c => c.op === 'fillText').map(c => c.text),
+    ctx,
+    calls,
+    texts: () => calls.filter((c) => c.op === 'fillText').map((c) => c.text),
   };
 }
 
@@ -43,9 +49,9 @@ const toastMock = jest.fn();
 // ---------------------------------------------------------------------------
 // Load browser-style plain JS files via a shared vm context
 // ---------------------------------------------------------------------------
-const fs   = require('fs');
+const fs = require('fs');
 const path = require('path');
-const vm   = require('vm');
+const vm = require('vm');
 
 function readPlugin(relPath) {
   return fs.readFileSync(path.join(__dirname, '..', 'plugin', relPath), 'utf8');
@@ -87,8 +93,12 @@ const combinedSrc = [
 const sandbox = {
   $UD: { toast: jest.fn(), setBaseDataIcon: jest.fn() },
   console,
-  setTimeout, clearTimeout, setInterval, clearInterval,
-  Promise, Blob: class Blob {},
+  setTimeout,
+  clearTimeout,
+  setInterval,
+  clearInterval,
+  Promise,
+  Blob: class Blob {},
   performance: { now: () => Date.now() },
 };
 vm.createContext(sandbox);
@@ -136,8 +146,8 @@ function makeAction(settings = {}) {
     settings: { ...action._defaultSettings(), ...settings },
     intervalId: null,
   };
-  action._cpu[context]     = null;
-  action._temp[context]    = null;
+  action._cpu[context] = null;
+  action._temp[context] = null;
   action._alerted[context] = { cpu: false, temp: false };
   return { action, context };
 }
@@ -153,11 +163,9 @@ beforeEach(() => {
   jest.clearAllMocks();
   toastMock.mockClear();
   // Reset the in-sandbox $UD mock
-  sandbox.$UD.toast.mockReset
-    ? sandbox.$UD.toast.mockReset()
-    : (sandbox.$UD.toast = toastMock);
+  sandbox.$UD.toast.mockReset ? sandbox.$UD.toast.mockReset() : (sandbox.$UD.toast = toastMock);
   lastCanvas = null;
-  BaseAction.prototype.createCanvas = function() {
+  BaseAction.prototype.createCanvas = function () {
     const rec = makeCanvas();
     lastCanvas = rec;
     return { canvas: rec.canvas, ctx: rec.ctx };
@@ -203,18 +211,24 @@ describe('_scanLHM – data extraction', () => {
     const { action } = makeAction();
     const deep = {
       Text: 'Root',
-      Children: [{
-        Text: 'Motherboard',
-        Children: [{
-          Text: 'Intel CPU',
-          Children: [{
-            Text: 'CPU Total',
-            Value: '33.7 %',
-            SensorType: 'Load',
-            Children: [],
-          }],
-        }],
-      }],
+      Children: [
+        {
+          Text: 'Motherboard',
+          Children: [
+            {
+              Text: 'Intel CPU',
+              Children: [
+                {
+                  Text: 'CPU Total',
+                  Value: '33.7 %',
+                  SensorType: 'Load',
+                  Children: [],
+                },
+              ],
+            },
+          ],
+        },
+      ],
     };
     expect(action._scanLHM(deep).load).toBeCloseTo(33.7, 1);
   });
@@ -280,7 +294,7 @@ describe('_sectionColor', () => {
 describe('_checkAlerts', () => {
   test('fires CPU toast when load exceeds threshold', () => {
     const { action, context } = makeAction({ cpuThreshold: 90 });
-    action._cpu[context]  = 95;
+    action._cpu[context] = 95;
     action._temp[context] = 60;
     action._checkAlerts(context);
     expect(sandbox.$UD.toast).toHaveBeenCalledWith(expect.stringContaining('CPU load'));
@@ -288,7 +302,7 @@ describe('_checkAlerts', () => {
 
   test('fires temp toast when temperature exceeds threshold', () => {
     const { action, context } = makeAction({ tempThreshold: 85 });
-    action._cpu[context]  = 30;
+    action._cpu[context] = 30;
     action._temp[context] = 92;
     action._checkAlerts(context);
     expect(sandbox.$UD.toast).toHaveBeenCalledWith(expect.stringContaining('overheat'));
@@ -297,7 +311,7 @@ describe('_checkAlerts', () => {
 
   test('does not fire toast below threshold', () => {
     const { action, context } = makeAction({ cpuThreshold: 90, tempThreshold: 85 });
-    action._cpu[context]  = 50;
+    action._cpu[context] = 50;
     action._temp[context] = 60;
     action._checkAlerts(context);
     expect(sandbox.$UD.toast).not.toHaveBeenCalled();
@@ -333,7 +347,7 @@ describe('_checkAlerts', () => {
 describe('render – what appears on screen', () => {
   test('shows CPU percentage when data is available', () => {
     const { action, context } = makeAction();
-    action._cpu[context]  = 42;
+    action._cpu[context] = 42;
     action._temp[context] = null;
     action.render(context);
     expect(lastCanvas.texts()).toContain('42%');
@@ -341,17 +355,17 @@ describe('render – what appears on screen', () => {
 
   test('shows CPU dash when no data', () => {
     const { action, context } = makeAction();
-    action._cpu[context]  = null;
+    action._cpu[context] = null;
     action._temp[context] = null;
     action.render(context);
     const texts = lastCanvas.texts();
     // Expect two dashes (one for each section)
-    expect(texts.filter(t => t === '—').length).toBe(2);
+    expect(texts.filter((t) => t === '—').length).toBe(2);
   });
 
   test('shows temperature in Celsius', () => {
     const { action, context } = makeAction();
-    action._cpu[context]  = 30;
+    action._cpu[context] = 30;
     action._temp[context] = 67;
     action.render(context);
     expect(lastCanvas.texts()).toContain('67°C');
@@ -367,7 +381,7 @@ describe('render – what appears on screen', () => {
 
   test('shows install hint when temp unavailable', () => {
     const { action, context } = makeAction();
-    action._cpu[context]  = null;
+    action._cpu[context] = null;
     action._temp[context] = null;
     action.render(context);
     expect(lastCanvas.texts()).toContain('install LHM');

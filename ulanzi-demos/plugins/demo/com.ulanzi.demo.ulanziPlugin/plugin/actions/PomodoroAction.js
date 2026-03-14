@@ -30,11 +30,11 @@ class PomodoroAction extends BaseAction {
 
   onInit(context) {
     this._state[context] = {
-      state:     'idle',
+      state: 'idle',
       remaining: 0,
-      total:     0,
-      count:     0,
-      paused:    false,
+      total: 0,
+      count: 0,
+      paused: false,
     };
     this.render(context);
   }
@@ -90,10 +90,10 @@ class PomodoroAction extends BaseAction {
     const s = this._buttons[context].settings;
     const ps = this._state[context];
     const secs = (s.workMin || 25) * 60;
-    ps.state     = 'work';
+    ps.state = 'work';
     ps.remaining = secs;
-    ps.total     = secs;
-    ps.paused    = false;
+    ps.total = secs;
+    ps.paused = false;
     this._startInterval(context, 1000, () => this._tick(context));
     this.render(context);
   }
@@ -102,10 +102,10 @@ class PomodoroAction extends BaseAction {
     const s = this._buttons[context].settings;
     const ps = this._state[context];
     const secs = (s.breakMin || 5) * 60;
-    ps.state     = 'break';
+    ps.state = 'break';
     ps.remaining = secs;
-    ps.total     = secs;
-    ps.paused    = false;
+    ps.total = secs;
+    ps.paused = false;
     this._startInterval(context, 1000, () => this._tick(context));
     this.render(context);
   }
@@ -162,36 +162,40 @@ class PomodoroAction extends BaseAction {
 
     // Top label
     let label = 'POMODORO';
-    if (ps.state === 'work')  label = ps.paused ? 'WORK (PAUSED)' : 'WORK';
+    if (ps.state === 'work') label = ps.paused ? 'WORK (PAUSED)' : 'WORK';
     if (ps.state === 'break') label = ps.paused ? 'BREAK (PAUSED)' : 'BREAK';
     this.renderText(ctx, label, SIZE / 2, 28, {
-      font: 'bold 22px sans-serif', color: '#ffffff',
+      font: 'bold 22px sans-serif',
+      color: '#ffffff',
     });
 
     if (ps.state === 'idle') {
       // Tomato + tap instruction
       this.renderText(ctx, '\uD83C\uDF45', SIZE / 2, 95, {
-        font: '52px sans-serif', color: '#ffffff',
+        font: '52px sans-serif',
+        color: '#ffffff',
       });
       this.renderText(ctx, 'TAP TO START', SIZE / 2, 148, {
-        font: '14px sans-serif', color: 'rgba(255,255,255,0.5)',
+        font: '14px sans-serif',
+        color: 'rgba(255,255,255,0.5)',
       });
     } else {
       // Countdown mm:ss
-      const m  = Math.floor(ps.remaining / 60);
-      const s  = ps.remaining % 60;
+      const m = Math.floor(ps.remaining / 60);
+      const s = ps.remaining % 60;
       const timeStr = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
       this.renderText(ctx, timeStr, SIZE / 2, 106, {
-        font: 'bold 52px monospace', color: '#ffffff',
+        font: 'bold 52px monospace',
+        color: '#ffffff',
       });
 
       // Progress arc
-      const progress  = ps.total > 0 ? (ps.total - ps.remaining) / ps.total : 0;
-      const arcColor  = ps.state === 'work' ? '#f85149' : '#39d353';
+      const progress = ps.total > 0 ? (ps.total - ps.remaining) / ps.total : 0;
+      const arcColor = ps.state === 'work' ? '#f85149' : '#39d353';
       ctx.save();
       ctx.strokeStyle = arcColor;
-      ctx.lineWidth   = 4;
-      ctx.lineCap     = 'round';
+      ctx.lineWidth = 4;
+      ctx.lineCap = 'round';
       ctx.beginPath();
       ctx.arc(98, 98, 80, -Math.PI / 2, -Math.PI / 2 + progress * 2 * Math.PI);
       ctx.stroke();
@@ -201,7 +205,8 @@ class PomodoroAction extends BaseAction {
     // Bottom: completed pomodoro count
     if (ps.count > 0) {
       this.renderText(ctx, `\uD83C\uDF45\u00D7${ps.count}`, SIZE / 2, 178, {
-        font: '16px sans-serif', color: 'rgba(255,255,255,0.6)',
+        font: '16px sans-serif',
+        color: 'rgba(255,255,255,0.6)',
       });
     }
 

@@ -5,8 +5,14 @@
  */
 class CounterAction extends BaseAction {
   _defaultSettings() {
-    return { step: 1, direction: 'increment', bgColor: '#1a1a2e',
-             incrementColor: '#39d353', decrementColor: '#f85149', value: 0 };
+    return {
+      step: 1,
+      direction: 'increment',
+      bgColor: '#1a1a2e',
+      incrementColor: '#39d353',
+      decrementColor: '#f85149',
+      value: 0,
+    };
   }
 
   onInit(context) {
@@ -52,14 +58,23 @@ class CounterAction extends BaseAction {
     this.renderText(ctx, 'COUNTER', 98, 32, { font: '22px sans-serif', color: '#8b949e' });
 
     // Value
-    const valueColor = value > 0
-      ? (s.incrementColor || '#39d353')
-      : value < 0 ? (s.decrementColor || '#f85149') : '#8b949e';
-    this.renderText(ctx, String(value), 98, 106, { font: 'bold 68px monospace', color: valueColor });
+    const valueColor =
+      value > 0
+        ? s.incrementColor || '#39d353'
+        : value < 0
+          ? s.decrementColor || '#f85149'
+          : '#8b949e';
+    this.renderText(ctx, String(value), 98, 106, {
+      font: 'bold 68px monospace',
+      color: valueColor,
+    });
 
     // Step hint
     const sign = s.direction === 'increment' ? '+' : '-';
-    this.renderText(ctx, `step: ${sign}${s.step}`, 98, 164, { font: '22px sans-serif', color: '#8b949e' });
+    this.renderText(ctx, `step: ${sign}${s.step}`, 98, 164, {
+      font: '22px sans-serif',
+      color: '#8b949e',
+    });
 
     $UD.setBaseDataIcon(context, this.canvasToBase64(canvas), '');
   }

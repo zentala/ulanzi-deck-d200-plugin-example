@@ -1,0 +1,10 @@
+{
+  "name": "ulanzi-workspace",
+  "private": true,
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "husky": "^9.0.0"
+  }
+}

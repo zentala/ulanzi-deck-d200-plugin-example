@@ -37,28 +37,54 @@ class CalendarAction extends BaseAction {
 
   onPress(context) {
     const now = new Date();
-    const months = ['January','February','March','April','May','June',
-                    'July','August','September','October','November','December'];
-    const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-    $UD.toast(`${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`);
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    $UD.toast(
+      `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`
+    );
   }
 
   render(context) {
     const state = this._buttons[context];
     if (!state) return;
 
-    const now    = new Date();
-    const months = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE',
-                    'JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
-    const days   = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+    const now = new Date();
+    const months = [
+      'JANUARY',
+      'FEBRUARY',
+      'MARCH',
+      'APRIL',
+      'MAY',
+      'JUNE',
+      'JULY',
+      'AUGUST',
+      'SEPTEMBER',
+      'OCTOBER',
+      'NOVEMBER',
+      'DECEMBER',
+    ];
+    const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 
     const monthName = months[now.getMonth()];
-    const year      = String(now.getFullYear());
-    const dayNum    = String(now.getDate());
-    const dayName   = days[now.getDay()];
+    const year = String(now.getFullYear());
+    const dayNum = String(now.getDate());
+    const dayName = days[now.getDay()];
 
-    const SIZE        = 196;
-    const HEADER_H    = 58;
+    const SIZE = 196;
+    const HEADER_H = 58;
     const { canvas, ctx } = this.createCanvas(SIZE, SIZE);
 
     // Full background
@@ -79,22 +105,26 @@ class CalendarAction extends BaseAction {
 
     // Month name in header
     this.renderText(ctx, monthName, SIZE / 2, 34, {
-      font: 'bold 24px sans-serif', color: '#ffffff',
+      font: 'bold 24px sans-serif',
+      color: '#ffffff',
     });
 
     // Year in header
     this.renderText(ctx, year, SIZE / 2, 52, {
-      font: '16px sans-serif', color: 'rgba(255,255,255,0.7)',
+      font: '16px sans-serif',
+      color: 'rgba(255,255,255,0.7)',
     });
 
     // Day number — huge, in white body area
     this.renderText(ctx, dayNum, SIZE / 2, 138, {
-      font: 'bold 96px sans-serif', color: '#1a1a1a',
+      font: 'bold 96px sans-serif',
+      color: '#1a1a1a',
     });
 
     // Day of week
     this.renderText(ctx, dayName, SIZE / 2, 178, {
-      font: '14px sans-serif', color: '#888888',
+      font: '14px sans-serif',
+      color: '#888888',
     });
 
     this._lastDay = now.getDate();

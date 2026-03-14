@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+
+PLUGIN_DIR="ulanzi-demos/plugins/demo/com.ulanzi.demo.ulanziPlugin"
+
+echo "→ typecheck"
+cd "$PLUGIN_DIR"
+pnpm typecheck
+
+echo "→ lint"
+pnpm lint
+
+echo "→ format check"
+pnpm format:check
+
+echo "→ tests"
+pnpm test
+
+cd -
