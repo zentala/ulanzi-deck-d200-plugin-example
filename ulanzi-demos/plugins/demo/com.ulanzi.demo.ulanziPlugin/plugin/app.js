@@ -4,25 +4,19 @@
  * to action handlers by UUID. Uses global $UD (UlanziStreamDeck instance).
  */
 
-const PLUGIN_UUID = 'com.ulanzi.demo';
+const PLUGIN_UUID = 'com.ulanzi.ulanzideck.demo';
 
 /** @type {Object.<string, BaseAction>} UUID → action instance */
 const ACTIONS = {
-  'com.ulanzi.demo.clock': new ClockAction(),
-  'com.ulanzi.demo.counter': new CounterAction(),
-  'com.ulanzi.demo.status': new StatusAction(),
+  'com.ulanzi.ulanzideck.demo.clock': new ClockAction(),
+  'com.ulanzi.ulanzideck.demo.counter': new CounterAction(),
+  'com.ulanzi.ulanzideck.demo.status': new StatusAction(),
   'com.ulanzi.ulanzideck.demo.calendar': new CalendarAction(),
   'com.ulanzi.ulanzideck.demo.pomodoro': new PomodoroAction(),
 };
 
-/** @type {Object.<string, BaseAction>} context → action (for onClear routing) */
+/** @type {Object.<string, BaseAction>} context → action (for event routing) */
 const CONTEXT_MAP = {};
-
-/** @param {object} jsn @param {string} method */
-function dispatch(jsn, method) {
-  const action = ACTIONS[jsn.action];
-  if (action) action[method](jsn);
-}
 
 $UD.connect(PLUGIN_UUID);
 
@@ -31,23 +25,36 @@ $UD.onConnected(() => {
 });
 
 $UD.onAdd((jsn) => {
-  CONTEXT_MAP[jsn.context] = ACTIONS[jsn.action];
-  dispatch(jsn, 'handleAdd');
+  const action = ACTIONS[jsn.uuid];
+  if (!action) return;
+  CONTEXT_MAP[jsn.context] = action;
+  action.handleAdd(jsn);
 });
 
-$UD.onRun((jsn) => dispatch(jsn, 'handleRun'));
-$UD.onSetActive((jsn) => dispatch(jsn, 'handleSetActive'));
-$UD.onParamFromApp((jsn) => dispatch(jsn, 'handleParams'));
-$UD.onParamFromPlugin((jsn) => dispatch(jsn, 'handleParams'));
+$UD.onRun((jsn) => {
+  const a = CONTEXT_MAP[jsn.context];
+  if (a) a.handleRun(jsn);
+});
+$UD.onSetActive((jsn) => {
+  const a = CONTEXT_MAP[jsn.context];
+  if (a) a.handleSetActive(jsn);
+});
+$UD.onParamFromApp((jsn) => {
+  const a = CONTEXT_MAP[jsn.context];
+  if (a) a.handleParams(jsn);
+});
+$UD.onParamFromPlugin((jsn) => {
+  const a = CONTEXT_MAP[jsn.context];
+  if (a) a.handleParams(jsn);
+});
 
 $UD.onClear((jsn) => {
   if (!jsn.param) return;
   for (const item of jsn.param) {
-    const context = item.context;
-    const action = CONTEXT_MAP[context];
-    if (action) {
-      action.handleClear(context);
-      delete CONTEXT_MAP[context];
+    const a = CONTEXT_MAP[item.context];
+    if (a) {
+      a.handleClear(item.context);
+      delete CONTEXT_MAP[item.context];
     }
   }
 });

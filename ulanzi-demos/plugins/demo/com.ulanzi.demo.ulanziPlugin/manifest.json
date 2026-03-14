@@ -6,7 +6,7 @@
   "Icon": "assets/icons/icon.png",
   "Category": "Ulanzi Demo",
   "CategoryIcon": "assets/icons/categoryIcon.png",
-  "UUID": "com.ulanzi.demo",
+  "UUID": "com.ulanzi.ulanzideck.demo",
   "Type": "JavaScript",
   "CodePath": "plugin/app.html",
   "PrivateAPI": true,
@@ -21,7 +21,7 @@
   "Actions": [
     {
       "Name": "Clock",
-      "UUID": "com.ulanzi.demo.clock",
+      "UUID": "com.ulanzi.ulanzideck.demo.clock",
       "Tooltip": "Digital clock updated every second",
       "Icon": "assets/icons/actionIcon.png",
       "PropertyInspectorPath": "property-inspector/clock/inspector.html",
@@ -33,7 +33,7 @@
     },
     {
       "Name": "Counter",
-      "UUID": "com.ulanzi.demo.counter",
+      "UUID": "com.ulanzi.ulanzideck.demo.counter",
       "Tooltip": "Tap to increment. Hold to reset.",
       "Icon": "assets/icons/actionIcon.png",
       "PropertyInspectorPath": "property-inspector/counter/inspector.html",
@@ -45,7 +45,7 @@
     },
     {
       "Name": "CPU Status",
-      "UUID": "com.ulanzi.demo.status",
+      "UUID": "com.ulanzi.ulanzideck.demo.status",
       "Tooltip": "CPU usage monitor with alert",
       "Icon": "assets/icons/actionIcon.png",
       "PropertyInspectorPath": "property-inspector/status/inspector.html",
@@ -59,20 +59,20 @@
       "Name": "Calendar",
       "Tooltip": "Today's date in calendar style",
       "UUID": "com.ulanzi.ulanzideck.demo.calendar",
-      "Icon": "assets/plugin-icon",
+      "Icon": "assets/icons/actionIcon.png",
       "PropertyInspectorPath": "property-inspector/calendar/inspector.html",
       "States": [
-        { "Image": "assets/plugin-icon", "TitleAlignment": "middle", "FontSize": "14" }
+        { "Image": "assets/icons/actionIcon.png", "TitleAlignment": "middle", "FontSize": "14" }
       ]
     },
     {
       "Name": "Pomodoro",
       "Tooltip": "Pomodoro work/break timer",
       "UUID": "com.ulanzi.ulanzideck.demo.pomodoro",
-      "Icon": "assets/plugin-icon",
+      "Icon": "assets/icons/actionIcon.png",
       "PropertyInspectorPath": "property-inspector/pomodoro/inspector.html",
       "States": [
-        { "Image": "assets/plugin-icon", "TitleAlignment": "middle", "FontSize": "14" }
+        { "Image": "assets/icons/actionIcon.png", "TitleAlignment": "middle", "FontSize": "14" }
       ]
     }
   ]

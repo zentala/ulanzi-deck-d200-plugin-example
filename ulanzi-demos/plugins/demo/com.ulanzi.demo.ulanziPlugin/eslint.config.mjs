@@ -61,6 +61,7 @@ export default [
         afterEach: 'readonly',
         afterAll: 'readonly',
         beforeAll: 'readonly',
+        global: 'readonly',
       },
     },
   },
