@@ -1,9 +1,8 @@
 /**
  * @file ClockAction.js
- * @description Digital clock action. Shows HH:MM (large), date below, and
- * an animated seconds-progress border arc drawn clockwise around the button.
- * Updates every second via setInterval. Press to toggle timezone between
- * Warsaw (PL) and Jakarta (JKT).
+ * @description Digital clock action. Shows date on top, HH:MM large in centre,
+ * timezone code + offset at bottom. Animated seconds-progress border (2px, r=6).
+ * Updates every second via setInterval. Press to toggle timezone: Warsaw ↔ Jakarta.
  */
 // eslint-disable-next-line no-unused-vars
 class ClockAction extends BaseAction {
@@ -42,8 +41,8 @@ class ClockAction extends BaseAction {
   }
 
   handleClear(context) {
-    delete this._timezone[context];
     super.handleClear(context);
+    delete this._timezone[context];
   }
 
   render(context) {
@@ -54,11 +53,15 @@ class ClockAction extends BaseAction {
     const tz = this._timezone[context] || 'PL';
     const tzName = tz === 'PL' ? 'Europe/Warsaw' : 'Asia/Jakarta';
     const now = new Date();
+
+    // HH:MM
     const timeStr = now.toLocaleTimeString('en-GB', {
       timeZone: tzName,
       hour: '2-digit',
       minute: '2-digit',
     });
+
+    // "MON 14 MAR"
     const dateStr = now
       .toLocaleDateString('en-US', {
         timeZone: tzName,
@@ -67,10 +70,21 @@ class ClockAction extends BaseAction {
         month: 'short',
       })
       .toUpperCase();
+
+    // Timezone abbreviation — 'short' is universally supported
+    const tzAbbr =
+      new Intl.DateTimeFormat('en-US', {
+        timeZone: tzName,
+        timeZoneName: 'short',
+      })
+        .formatToParts(now)
+        .find((p) => p.type === 'timeZoneName')?.value || (tz === 'PL' ? 'CET' : 'WIB');
+
+    // Bottom label: "PL · CET" or "JKT · WIB"
     const tzLabel = tz === 'PL' ? 'PL' : 'JKT';
+    const tzLine = `${tzLabel} · ${tzAbbr}`;
 
     const sec = now.getSeconds();
-
     const SIZE = 196;
     const { canvas, ctx } = this.createCanvas(SIZE, SIZE);
 
@@ -81,34 +95,29 @@ class ClockAction extends BaseAction {
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, SIZE, SIZE);
 
-    // Seconds progress border using setLineDash on a rounded-rect path
-    // Perimeter: 2*(w-2r) + 2*(h-2r) + 2*PI*r  where w=h=190, r=4
+    // Seconds-progress border — 2px stroke, r=6
+    // Perimeter: 2*(w-2r) + 2*(h-2r) + 2*PI*r  where w=h=190, r=6
     const bx = 3,
       by = 3,
       bw = 190,
       bh = 190,
-      br = 4;
+      br = 6;
     const perimeter = 2 * (bw - 2 * br) + 2 * (bh - 2 * br) + 2 * Math.PI * br;
     const dashLen = (sec / 60) * perimeter;
 
     /**
-     * Draws a clockwise rounded-rect path starting from top-left corner arc.
+     * Draws a clockwise rounded-rect path starting from top-left corner.
      * @param {CanvasRenderingContext2D} c
      */
     function roundedRectPath(c) {
       c.beginPath();
-      // Start at top edge after top-left arc
       c.moveTo(bx + br, by);
-      // Top edge → top-right arc
       c.lineTo(bx + bw - br, by);
       c.arcTo(bx + bw, by, bx + bw, by + br, br);
-      // Right edge → bottom-right arc
       c.lineTo(bx + bw, by + bh - br);
       c.arcTo(bx + bw, by + bh, bx + bw - br, by + bh, br);
-      // Bottom edge → bottom-left arc
       c.lineTo(bx + br, by + bh);
       c.arcTo(bx, by + bh, bx, by + bh - br, br);
-      // Left edge → top-left arc
       c.lineTo(bx, by + br);
       c.arcTo(bx, by, bx + br, by, br);
       c.closePath();
@@ -117,7 +126,7 @@ class ClockAction extends BaseAction {
     if (sec > 0) {
       ctx.save();
       ctx.strokeStyle = '#4a9eff';
-      ctx.lineWidth = 3;
+      ctx.lineWidth = 2;
       ctx.setLineDash([dashLen, perimeter - dashLen]);
       ctx.lineDashOffset = 0;
       roundedRectPath(ctx);
@@ -126,23 +135,23 @@ class ClockAction extends BaseAction {
       ctx.restore();
     }
 
-    // Time — large, bold, centered
-    this.renderText(ctx, timeStr, 98, 82, {
-      font: 'bold 52px monospace',
-      color: s.textColor || '#ffffff',
-    });
-
-    // Date below
+    // TOP — date: "MON 14 MAR"
     if (s.showDate) {
-      this.renderText(ctx, dateStr, 98, 138, {
-        font: '20px sans-serif',
+      this.renderText(ctx, dateStr, 98, 34, {
+        font: "14px 'Courier New', monospace",
         color: '#8b949e',
       });
     }
 
-    // Timezone label — small, grayish-blue, below date
-    this.renderText(ctx, tzLabel, 98, 168, {
-      font: '16px sans-serif',
+    // CENTRE — time: "09:41"
+    this.renderText(ctx, timeStr, 98, 112, {
+      font: "bold 58px 'Courier New', monospace",
+      color: s.textColor || '#ffffff',
+    });
+
+    // BOTTOM — timezone: "PL · CET+1"
+    this.renderText(ctx, tzLine, 98, 170, {
+      font: "13px 'Courier New', monospace",
       color: '#6a8caf',
     });
 

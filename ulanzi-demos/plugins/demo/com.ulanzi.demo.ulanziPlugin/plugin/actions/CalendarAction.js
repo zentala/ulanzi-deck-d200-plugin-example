@@ -5,17 +5,23 @@
  */
 // eslint-disable-next-line no-unused-vars
 class CalendarAction extends BaseAction {
+  constructor() {
+    super();
+    /** @type {Object.<string, number>} Per-context last rendered day-of-month. */
+    this._lastDay = {};
+  }
+
   _defaultSettings() {
     return {};
   }
 
   onInit(context) {
-    this._lastDay = -1;
+    this._lastDay[context] = -1;
     this.render(context);
     this._startInterval(context, 60000, () => {
       const today = new Date().getDate();
-      if (today !== this._lastDay) {
-        this._lastDay = today;
+      if (today !== this._lastDay[context]) {
+        this._lastDay[context] = today;
         this.render(context);
       }
     });
@@ -26,14 +32,19 @@ class CalendarAction extends BaseAction {
       this.render(context);
       this._startInterval(context, 60000, () => {
         const today = new Date().getDate();
-        if (today !== this._lastDay) {
-          this._lastDay = today;
+        if (today !== this._lastDay[context]) {
+          this._lastDay[context] = today;
           this.render(context);
         }
       });
     } else {
       this._stopInterval(context);
     }
+  }
+
+  handleClear(context) {
+    super.handleClear(context);
+    delete this._lastDay[context];
   }
 
   onPress(_context) {
@@ -110,7 +121,7 @@ class CalendarAction extends BaseAction {
       color: '#888888',
     });
 
-    this._lastDay = now.getDate();
+    this._lastDay[context] = now.getDate();
     $UD.setBaseDataIcon(context, this.canvasToBase64(canvas), '');
   }
 }

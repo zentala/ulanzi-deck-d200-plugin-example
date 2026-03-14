@@ -111,7 +111,7 @@ describe('ClockAction – render', () => {
     const action = makeAction();
     action.render(CTX);
     const texts = patch.getLastCanvas().texts();
-    expect(texts).toContain('PL');
+    expect(texts.some((t) => t.startsWith('PL'))).toBe(true);
   });
 
   test('renders timezone label JKT after toggle to Jakarta', () => {
@@ -119,7 +119,7 @@ describe('ClockAction – render', () => {
     action.onPress(CTX);
     action.render(CTX);
     const texts = patch.getLastCanvas().texts();
-    expect(texts).toContain('JKT');
+    expect(texts.some((t) => t.startsWith('JKT'))).toBe(true);
   });
 });
 
@@ -199,6 +199,6 @@ describe('ClockAction – timezone', () => {
     const texts = patch.getLastCanvas().texts();
     const timeText = texts.find((t) => /^\d{2}:\d{2}$/.test(t));
     expect(timeText).toBeDefined();
-    expect(texts).toContain('JKT');
+    expect(texts.some((t) => t.startsWith('JKT'))).toBe(true);
   });
 });

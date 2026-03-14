@@ -131,3 +131,12 @@ describe('PomodoroAction – break → idle transition', () => {
     expect(action._state[CTX].state).toBe('idle');
   });
 });
+
+describe('PomodoroAction – handleClear', () => {
+  test('handleClear removes _state entry for context', () => {
+    const a = makeAction();
+    expect(a._state[CTX]).toBeDefined();
+    a.handleClear(CTX);
+    expect(a._state[CTX]).toBeUndefined();
+  });
+});

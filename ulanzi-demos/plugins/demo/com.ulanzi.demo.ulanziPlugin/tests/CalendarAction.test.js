@@ -124,3 +124,34 @@ describe('CalendarAction – interval', () => {
     expect(action._buttons[CTX].intervalId).not.toBeNull();
   });
 });
+
+describe('CalendarAction – handleClear', () => {
+  test('handleClear removes _lastDay entry for context', () => {
+    const a = makeAction();
+    expect(a._lastDay[CTX]).toBeDefined();
+    a.handleClear(CTX);
+    expect(a._lastDay[CTX]).toBeUndefined();
+  });
+});
+
+describe('CalendarAction – multi-context isolation', () => {
+  const CTX2 = 'calendar__ctx__2';
+
+  test('two contexts maintain independent _lastDay values', () => {
+    const a = new CalendarAction();
+    a.handleAdd(makeJsn(CTX, 'com.ulanzi.ulanzideck.demo.calendar'));
+    a.handleAdd(makeJsn(CTX2, 'com.ulanzi.ulanzideck.demo.calendar'));
+
+    a._lastDay[CTX] = 10;
+    a._lastDay[CTX2] = 20;
+
+    expect(a._lastDay[CTX]).toBe(10);
+    expect(a._lastDay[CTX2]).toBe(20);
+
+    a.handleClear(CTX);
+    expect(a._lastDay[CTX]).toBeUndefined();
+    expect(a._lastDay[CTX2]).toBe(20);
+
+    a.handleClear(CTX2);
+  });
+});
