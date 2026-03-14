@@ -8,103 +8,25 @@
  *  - Section color thresholds
  *  - Alert toast triggers
  *  - Canvas render output (what text appears on screen)
+ *  - Worker lifecycle (terminate on last context removal)
  *
  * Run: pnpm test
  */
+const { createSandbox, patchCreateCanvas } = require('./helpers');
 
-// ---------------------------------------------------------------------------
-// Recording canvas helper (used in render tests)
-// ---------------------------------------------------------------------------
+const { sandbox, classes } = createSandbox(['StatusAction.js'], ['BaseAction', 'StatusAction']);
+const { BaseAction, StatusAction } = classes;
 
-function makeCanvas() {
-  const calls = [];
-  const ctx = {
-    calls,
-    fillStyle: '',
-    strokeStyle: '',
-    lineWidth: 0,
-    font: '',
-    textAlign: 'center',
-    textBaseline: 'middle',
-    fillRect: (...a) => calls.push({ op: 'fillRect', args: a }),
-    strokeRect: (...a) => calls.push({ op: 'strokeRect', args: a }),
-    fillText: (text, x, y) => calls.push({ op: 'fillText', text, x, y }),
-    createLinearGradient: () => ({ addColorStop: () => {} }),
-  };
-  return {
-    canvas: {
-      width: 196,
-      height: 196,
-      getContext: () => ctx,
-      toDataURL: () => 'data:image/png;base64,MOCK',
-    },
-    ctx,
-    calls,
-    texts: () => calls.filter((c) => c.op === 'fillText').map((c) => c.text),
-  };
-}
+let patch;
 
-const toastMock = jest.fn();
+beforeEach(() => {
+  jest.clearAllMocks();
+  patch = patchCreateCanvas(BaseAction);
+});
 
-// ---------------------------------------------------------------------------
-// Load browser-style plain JS files via a shared vm context
-// ---------------------------------------------------------------------------
-const fs = require('fs');
-const path = require('path');
-const vm = require('vm');
-
-function readPlugin(relPath) {
-  return fs.readFileSync(path.join(__dirname, '..', 'plugin', relPath), 'utf8');
-}
-
-// Build one combined script: shims + BaseAction + StatusAction
-// All classes end up in the same vm context, so inheritance works.
-const combinedSrc = [
-  // Minimal browser shims available to the class code
-  `
-  const document = {
-    createElement: (tag) => {
-      if (tag !== 'canvas') return {};
-      const calls = [];
-      const ctx = {
-        calls,
-        fillStyle: '', strokeStyle: '', lineWidth: 0,
-        font: '', textAlign: 'center', textBaseline: 'middle',
-        fillRect:   (...a) => calls.push({ op:'fillRect', args:a }),
-        strokeRect: (...a) => calls.push({ op:'strokeRect', args:a }),
-        fillText:   (t,x,y) => calls.push({ op:'fillText', text:t, x, y }),
-        createLinearGradient: () => ({ addColorStop: () => {} }),
-      };
-      return { getContext: () => ctx, width:196, height:196,
-               toDataURL: () => 'data:image/png;base64,MOCK' };
-    }
-  };
-  const URL    = { createObjectURL: () => 'blob:mock' };
-  class Worker { constructor(){} terminate() {} set onmessage(_fn) {} }
-  const fetch  = () => Promise.reject(new Error('fetch not available'));
-  `,
-  readPlugin('actions/BaseAction.js'),
-  readPlugin('actions/StatusAction.js'),
-  // Expose classes on the vm context object (this = sandbox in vm)
-  'this.BaseAction = BaseAction; this.StatusAction = StatusAction;',
-].join('\n');
-
-// Sandbox: inject jest mocks, extract classes after execution
-const sandbox = {
-  $UD: { toast: jest.fn(), setBaseDataIcon: jest.fn() },
-  console,
-  setTimeout,
-  clearTimeout,
-  setInterval,
-  clearInterval,
-  Promise,
-  Blob: class Blob {},
-  performance: { now: () => Date.now() },
-};
-vm.createContext(sandbox);
-vm.runInContext(combinedSrc, sandbox);
-
-const { BaseAction, StatusAction } = sandbox;
+afterEach(() => {
+  patch.restore();
+});
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -138,7 +60,7 @@ function lhmTree({ cpuLoad = null, cpuTemp = null } = {}) {
   };
 }
 
-/** Create a StatusAction with one context pre-initialised. */
+/** Create a StatusAction with one context pre-initialised (no handleAdd — avoids starting intervals). */
 function makeAction(settings = {}) {
   const action = new StatusAction();
   const context = 'test___key___aid';
@@ -151,30 +73,6 @@ function makeAction(settings = {}) {
   action._alerted[context] = { cpu: false, temp: false };
   return { action, context };
 }
-
-// ---------------------------------------------------------------------------
-// Override createCanvas so we can inspect draw calls
-// ---------------------------------------------------------------------------
-
-let lastCanvas;
-const origCreate = BaseAction.prototype.createCanvas;
-
-beforeEach(() => {
-  jest.clearAllMocks();
-  toastMock.mockClear();
-  // Reset the in-sandbox $UD mock
-  sandbox.$UD.toast.mockReset ? sandbox.$UD.toast.mockReset() : (sandbox.$UD.toast = toastMock);
-  lastCanvas = null;
-  BaseAction.prototype.createCanvas = function () {
-    const rec = makeCanvas();
-    lastCanvas = rec;
-    return { canvas: rec.canvas, ctx: rec.ctx };
-  };
-});
-
-afterAll(() => {
-  BaseAction.prototype.createCanvas = origCreate;
-});
 
 // ---------------------------------------------------------------------------
 // 1. LHM parsing
@@ -350,7 +248,7 @@ describe('render – what appears on screen', () => {
     action._cpu[context] = 42;
     action._temp[context] = null;
     action.render(context);
-    expect(lastCanvas.texts()).toContain('42%');
+    expect(patch.getLastCanvas().texts()).toContain('42%');
   });
 
   test('shows CPU dash when no data', () => {
@@ -358,7 +256,7 @@ describe('render – what appears on screen', () => {
     action._cpu[context] = null;
     action._temp[context] = null;
     action.render(context);
-    const texts = lastCanvas.texts();
+    const texts = patch.getLastCanvas().texts();
     // Expect two dashes (one for each section)
     expect(texts.filter((t) => t === '—').length).toBe(2);
   });
@@ -368,13 +266,13 @@ describe('render – what appears on screen', () => {
     action._cpu[context] = 30;
     action._temp[context] = 67;
     action.render(context);
-    expect(lastCanvas.texts()).toContain('67°C');
+    expect(patch.getLastCanvas().texts()).toContain('67°C');
   });
 
   test('shows section labels CPU and TEMP', () => {
     const { action, context } = makeAction();
     action.render(context);
-    const texts = lastCanvas.texts();
+    const texts = patch.getLastCanvas().texts();
     expect(texts).toContain('CPU');
     expect(texts).toContain('TEMP');
   });
@@ -384,13 +282,47 @@ describe('render – what appears on screen', () => {
     action._cpu[context] = null;
     action._temp[context] = null;
     action.render(context);
-    expect(lastCanvas.texts()).toContain('install LHM');
+    expect(patch.getLastCanvas().texts()).toContain('install LHM');
   });
 
   test('does not show install hint when temp available', () => {
     const { action, context } = makeAction();
     action._temp[context] = 55;
     action.render(context);
-    expect(lastCanvas.texts()).not.toContain('install LHM');
+    expect(patch.getLastCanvas().texts()).not.toContain('install LHM');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 6. handleClear – Worker lifecycle
+// ---------------------------------------------------------------------------
+
+describe('handleClear – Worker termination', () => {
+  test('nulls out _worker when last context is removed', () => {
+    const action = new StatusAction();
+    expect(action._worker).not.toBeNull();
+
+    const ctx = 'worker_test_ctx';
+    action._buttons[ctx] = { settings: action._defaultSettings(), intervalId: null };
+    action._cpu[ctx] = null;
+    action._temp[ctx] = null;
+    action._alerted[ctx] = { cpu: false, temp: false };
+
+    action.handleClear(ctx);
+    expect(action._worker).toBeNull();
+  });
+
+  test('preserves _worker when other contexts still exist', () => {
+    const action = new StatusAction();
+
+    ['ctx1', 'ctx2'].forEach((ctx) => {
+      action._buttons[ctx] = { settings: action._defaultSettings(), intervalId: null };
+      action._cpu[ctx] = null;
+      action._temp[ctx] = null;
+      action._alerted[ctx] = { cpu: false, temp: false };
+    });
+
+    action.handleClear('ctx1'); // ctx2 still registered
+    expect(action._worker).not.toBeNull();
   });
 });

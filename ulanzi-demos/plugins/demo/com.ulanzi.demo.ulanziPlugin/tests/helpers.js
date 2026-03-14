@@ -56,7 +56,7 @@ const document = {
   }
 };
 const URL    = { createObjectURL: () => 'blob:mock' };
-class Worker { constructor(){} }
+class Worker { constructor(){} terminate() {} }
 const fetch  = () => Promise.reject(new Error('fetch not available'));
 `;
 

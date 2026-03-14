@@ -20,6 +20,11 @@ function makeAction() {
 let patch;
 
 beforeEach(() => {
+  jest.useFakeTimers();
+  sandbox.setInterval = global.setInterval;
+  sandbox.clearInterval = global.clearInterval;
+  sandbox.setTimeout = global.setTimeout;
+  sandbox.clearTimeout = global.clearTimeout;
   jest.clearAllMocks();
   patch = patchCreateCanvas(BaseAction);
 });
@@ -27,6 +32,11 @@ beforeEach(() => {
 afterEach(() => {
   if (action) action.handleClear(CTX);
   patch.restore();
+  jest.useRealTimers();
+  sandbox.setInterval = global.setInterval;
+  sandbox.clearInterval = global.clearInterval;
+  sandbox.setTimeout = global.setTimeout;
+  sandbox.clearTimeout = global.clearTimeout;
 });
 
 // ---------------------------------------------------------------------------
