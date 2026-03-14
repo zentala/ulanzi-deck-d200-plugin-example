@@ -53,9 +53,14 @@
 
   <button class="btn-save" id="btnSave">Save</button>
 
-  <script src="../../libs/plugin-common-html/index.js"></script>
+  <script src="../../plugin/libs/js/constants.js"></script>
+  <script src="../../plugin/libs/js/eventEmitter.js"></script>
+  <script src="../../plugin/libs/js/timers.js"></script>
+  <script src="../../plugin/libs/js/utils.js"></script>
+  <script src="../../plugin/libs/js/ulanzideckApi.js"></script>
   <script>
-    const api = window.$PI;
+    $UD.connect('com.ulanzi.demo.status');
+
     const thresholdInput   = document.getElementById('alertThreshold');
     const thresholdDisplay = document.getElementById('thresholdDisplay');
 
@@ -63,25 +68,25 @@
       thresholdDisplay.textContent = `${thresholdInput.value}%`;
     });
 
-    api.onDidReceiveSettings((_actionUUID, _context, settings) => {
-      if (!settings) return;
-      if (settings.alertThreshold !== undefined) {
-        thresholdInput.value = settings.alertThreshold;
-        thresholdDisplay.textContent = `${settings.alertThreshold}%`;
+    $UD.onParamFromPlugin(jsn => {
+      if (!jsn || !jsn.param) return;
+      const p = jsn.param;
+      if (p.alertThreshold !== undefined) {
+        thresholdInput.value = p.alertThreshold;
+        thresholdDisplay.textContent = `${p.alertThreshold}%`;
       }
-      if (settings.intervalSec !== undefined)
-        document.getElementById('intervalSec').value = settings.intervalSec;
-      if (settings.showCores !== undefined)
-        document.getElementById('showCores').checked = settings.showCores;
+      if (p.intervalSec !== undefined)
+        document.getElementById('intervalSec').value = p.intervalSec;
+      if (p.showCores !== undefined)
+        document.getElementById('showCores').checked = p.showCores;
     });
 
     document.getElementById('btnSave').addEventListener('click', () => {
-      const payload = {
+      $UD.sendParamFromPlugin({
         alertThreshold: parseInt(thresholdInput.value, 10),
         intervalSec:    parseInt(document.getElementById('intervalSec').value, 10),
         showCores:      document.getElementById('showCores').checked,
-      };
-      api.sendToPlugin(payload);
+      });
     });
   </script>
 </body>

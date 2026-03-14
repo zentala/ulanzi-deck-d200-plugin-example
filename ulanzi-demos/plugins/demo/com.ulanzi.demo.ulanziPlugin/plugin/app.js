@@ -1,93 +1,51 @@
 /**
  * @file app.js
- * @description Main dispatcher for the Ulanzi Demo plugin.
- * Connects to the UlanziStudio WebSocket bridge, instantiates all actions,
- * and routes every SDK lifecycle event to the matching action handler.
+ * @description Plugin entry point. Connects to UlanziStudio and routes events
+ * to action handlers by UUID. Uses global $UD (UlanziStreamDeck instance).
  */
-
-import ClockAction from './actions/ClockAction.js';
-import CounterAction from './actions/CounterAction.js';
-import StatusAction from './actions/StatusAction.js';
 
 const PLUGIN_UUID = 'com.ulanzi.demo';
 
-/** @type {UlanziApi} – injected by plugin-common-node/index.js as a global */
-const api = window.$UD;
-
-/** Map of action UUID → action instance */
-const actionMap = {
-  'com.ulanzi.demo.clock':   new ClockAction(api, 'com.ulanzi.demo.clock'),
-  'com.ulanzi.demo.counter': new CounterAction(api, 'com.ulanzi.demo.counter'),
-  'com.ulanzi.demo.status':  new StatusAction(api, 'com.ulanzi.demo.status'),
+/** @type {Object.<string, BaseAction>} UUID → action instance */
+const ACTIONS = {
+  'com.ulanzi.demo.clock':   new ClockAction(),
+  'com.ulanzi.demo.counter': new CounterAction(),
+  'com.ulanzi.demo.status':  new StatusAction(),
 };
 
-/** Map of button context → action instance (populated on onAdd, cleared on onClear) */
-const contextRegistry = new Map();
+/** @type {Object.<string, BaseAction>} context → action (for onClear routing) */
+const CONTEXT_MAP = {};
 
-/**
- * Returns the action responsible for a given button context.
- * @param {string} context
- * @returns {import('./actions/BaseAction.js').BaseAction | undefined}
- */
-function actionForContext(context) {
-  return contextRegistry.get(context);
+/** @param {object} jsn @param {string} method */
+function dispatch(jsn, method) {
+  const action = ACTIONS[jsn.action];
+  if (action) action[method](jsn);
 }
 
-// ---------------------------------------------------------------------------
-// SDK event wiring
-// ---------------------------------------------------------------------------
+$UD.connect(PLUGIN_UUID);
 
-api.onConnected(() => {
-  api.toast('Demo Plugin loaded');
+$UD.onConnected(() => {
+  $UD.toast('Demo Plugin loaded');
 });
 
-api.onAdd((actionUUID, context, settings) => {
-  const action = actionMap[actionUUID];
-  if (!action) return;
-  contextRegistry.set(context, action);
-  action.handleAdd(context, settings);
+$UD.onAdd(jsn => {
+  CONTEXT_MAP[jsn.context] = ACTIONS[jsn.action];
+  dispatch(jsn, 'handleAdd');
 });
 
-api.onClear((actionUUID, context) => {
-  const action = actionForContext(context);
-  if (action) action.handleClear(context);
-  contextRegistry.delete(context);
-});
+$UD.onRun(jsn         => dispatch(jsn, 'handleRun'));
+$UD.onSetActive(jsn   => dispatch(jsn, 'handleSetActive'));
+$UD.onParamFromApp(jsn => dispatch(jsn, 'handleParams'));
+$UD.onParamFromPlugin(jsn => dispatch(jsn, 'handleParams'));
 
-api.onRun((actionUUID, context, settings) => {
-  const action = actionForContext(context);
-  if (action) action.handleRun(context, settings);
+$UD.onClear(jsn => {
+  if (!jsn.param) return;
+  for (const item of jsn.param) {
+    const context = item.context;
+    const action = CONTEXT_MAP[context];
+    if (action) {
+      action.handleClear(context);
+      delete CONTEXT_MAP[context];
+    }
+  }
 });
-
-api.onKeyDown((actionUUID, context, settings) => {
-  const action = actionForContext(context);
-  if (action) action.handleKeyDown(context, settings);
-});
-
-api.onKeyUp((actionUUID, context, settings) => {
-  const action = actionForContext(context);
-  if (action) action.handleKeyUp(context, settings);
-});
-
-api.onSetActive((actionUUID, context, settings) => {
-  const action = actionForContext(context);
-  if (action) action.handleSetActive(context, settings);
-});
-
-api.onParamFromApp((actionUUID, context, payload) => {
-  const action = actionForContext(context);
-  if (action) action.handleParamFromApp(context, payload);
-});
-
-api.onDialRotate((actionUUID, context, settings, ticks) => {
-  const action = actionForContext(context);
-  if (action) action.handleDialRotate(context, settings, ticks);
-});
-
-api.onDidReceiveSettings((actionUUID, context, settings) => {
-  const action = actionForContext(context);
-  if (action) action.handleDidReceiveSettings(context, settings);
-});
-
-// Connect to the UlanziStudio bridge
-api.connect(PLUGIN_UUID);

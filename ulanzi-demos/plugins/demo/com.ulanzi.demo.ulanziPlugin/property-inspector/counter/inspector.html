@@ -59,37 +59,41 @@
     <button class="btn-save"  id="btnSave">Save</button>
   </div>
 
-  <script src="../../libs/plugin-common-html/index.js"></script>
+  <script src="../../plugin/libs/js/constants.js"></script>
+  <script src="../../plugin/libs/js/eventEmitter.js"></script>
+  <script src="../../plugin/libs/js/timers.js"></script>
+  <script src="../../plugin/libs/js/utils.js"></script>
+  <script src="../../plugin/libs/js/ulanzideckApi.js"></script>
   <script>
-    const api = window.$PI;
+    $UD.connect('com.ulanzi.demo.counter');
 
-    api.onDidReceiveSettings((_actionUUID, _context, settings) => {
-      if (!settings) return;
-      if (settings.step !== undefined)
-        document.getElementById('step').value = settings.step;
-      if (settings.direction)
-        document.getElementById('direction').value = settings.direction;
-      if (settings.bgColor)
-        document.getElementById('bgColor').value = settings.bgColor;
-      if (settings.incrementColor)
-        document.getElementById('incrementColor').value = settings.incrementColor;
-      if (settings.decrementColor)
-        document.getElementById('decrementColor').value = settings.decrementColor;
+    $UD.onParamFromPlugin(jsn => {
+      if (!jsn || !jsn.param) return;
+      const p = jsn.param;
+      if (p.step !== undefined)
+        document.getElementById('step').value = p.step;
+      if (p.direction)
+        document.getElementById('direction').value = p.direction;
+      if (p.bgColor)
+        document.getElementById('bgColor').value = p.bgColor;
+      if (p.incrementColor)
+        document.getElementById('incrementColor').value = p.incrementColor;
+      if (p.decrementColor)
+        document.getElementById('decrementColor').value = p.decrementColor;
     });
 
     document.getElementById('btnSave').addEventListener('click', () => {
-      const payload = {
+      $UD.sendParamFromPlugin({
         step:           parseInt(document.getElementById('step').value, 10) || 1,
         direction:      document.getElementById('direction').value,
         bgColor:        document.getElementById('bgColor').value,
         incrementColor: document.getElementById('incrementColor').value,
         decrementColor: document.getElementById('decrementColor').value,
-      };
-      api.sendToPlugin(payload);
+      });
     });
 
     document.getElementById('btnReset').addEventListener('click', () => {
-      api.sendToPlugin({ action: 'reset' });
+      $UD.sendParamFromPlugin({ action: 'reset' });
     });
   </script>
 </body>

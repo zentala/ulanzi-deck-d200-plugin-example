@@ -47,29 +47,32 @@
 
   <button class="btn-save" id="btnSave">Save</button>
 
-  <script src="../../libs/plugin-common-html/index.js"></script>
+  <script src="../../plugin/libs/js/constants.js"></script>
+  <script src="../../plugin/libs/js/eventEmitter.js"></script>
+  <script src="../../plugin/libs/js/timers.js"></script>
+  <script src="../../plugin/libs/js/utils.js"></script>
+  <script src="../../plugin/libs/js/ulanzideckApi.js"></script>
   <script>
-    const api = window.$PI;
+    $UD.connect('com.ulanzi.demo.clock');
 
-    /** Populate form from received settings. */
-    api.onDidReceiveSettings((_actionUUID, _context, settings) => {
-      if (!settings) return;
-      if (settings.bgColor)    document.getElementById('bgColor').value    = settings.bgColor;
-      if (settings.textColor)  document.getElementById('textColor').value  = settings.textColor;
-      if (settings.showSeconds !== undefined)
-        document.getElementById('showSeconds').checked = settings.showSeconds;
-      if (settings.showDate !== undefined)
-        document.getElementById('showDate').checked = settings.showDate;
+    $UD.onParamFromPlugin(jsn => {
+      if (!jsn || !jsn.param) return;
+      const p = jsn.param;
+      if (p.bgColor)    document.getElementById('bgColor').value    = p.bgColor;
+      if (p.textColor)  document.getElementById('textColor').value  = p.textColor;
+      if (p.showSeconds !== undefined)
+        document.getElementById('showSeconds').checked = p.showSeconds;
+      if (p.showDate !== undefined)
+        document.getElementById('showDate').checked = p.showDate;
     });
 
     document.getElementById('btnSave').addEventListener('click', () => {
-      const payload = {
+      $UD.sendParamFromPlugin({
         bgColor:     document.getElementById('bgColor').value,
         textColor:   document.getElementById('textColor').value,
         showSeconds: document.getElementById('showSeconds').checked,
         showDate:    document.getElementById('showDate').checked,
-      };
-      api.sendToPlugin(payload);
+      });
     });
   </script>
 </body>
