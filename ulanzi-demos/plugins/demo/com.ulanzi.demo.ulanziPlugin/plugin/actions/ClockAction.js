@@ -2,14 +2,22 @@
  * @file ClockAction.js
  * @description Digital clock action. Shows HH:MM (large), date below, and
  * an animated seconds-progress border arc drawn clockwise around the button.
- * Updates every second via setInterval.
+ * Updates every second via setInterval. Press to toggle timezone between
+ * Warsaw (PL) and Jakarta (JKT).
  */
 class ClockAction extends BaseAction {
+  constructor() {
+    super();
+    /** @type {Object.<string, string>} context → timezone key ('PL' | 'Asia/Jakarta') */
+    this._timezone = {};
+  }
+
   _defaultSettings() {
     return { bgColor: '#0d1117', textColor: '#ffffff', showDate: true };
   }
 
   onInit(context) {
+    this._timezone[context] = 'PL';
     this._startInterval(context, 1000, () => this.render(context));
     this.render(context);
   }
@@ -24,11 +32,17 @@ class ClockAction extends BaseAction {
   }
 
   onPress(context) {
-    $UD.toast('Clock running');
+    this._timezone[context] = this._timezone[context] === 'PL' ? 'Asia/Jakarta' : 'PL';
+    this.render(context);
   }
 
   onSettings(context, params) {
     this.render(context);
+  }
+
+  handleClear(context) {
+    delete this._timezone[context];
+    super.handleClear(context);
   }
 
   render(context) {
@@ -36,28 +50,25 @@ class ClockAction extends BaseAction {
     if (!state) return;
     const s = state.settings;
 
+    const tz = this._timezone[context] || 'PL';
+    const tzName = tz === 'PL' ? 'Europe/Warsaw' : 'Asia/Jakarta';
     const now = new Date();
-    const hh = String(now.getHours()).padStart(2, '0');
-    const mm = String(now.getMinutes()).padStart(2, '0');
-    const sec = now.getSeconds();
-    const timeStr = `${hh}:${mm}`;
+    const timeStr = now.toLocaleTimeString('en-GB', {
+      timeZone: tzName,
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    const dateStr = now
+      .toLocaleDateString('en-US', {
+        timeZone: tzName,
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+      })
+      .toUpperCase();
+    const tzLabel = tz === 'PL' ? 'PL' : 'JKT';
 
-    const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
-    const months = [
-      'JAN',
-      'FEB',
-      'MAR',
-      'APR',
-      'MAY',
-      'JUN',
-      'JUL',
-      'AUG',
-      'SEP',
-      'OCT',
-      'NOV',
-      'DEC',
-    ];
-    const dateStr = `${days[now.getDay()]} ${now.getDate()} ${months[now.getMonth()]}`;
+    const sec = now.getSeconds();
 
     const SIZE = 196;
     const { canvas, ctx } = this.createCanvas(SIZE, SIZE);
@@ -115,18 +126,24 @@ class ClockAction extends BaseAction {
     }
 
     // Time — large, bold, centered
-    this.renderText(ctx, timeStr, 98, 90, {
+    this.renderText(ctx, timeStr, 98, 82, {
       font: 'bold 52px monospace',
       color: s.textColor || '#ffffff',
     });
 
     // Date below
     if (s.showDate) {
-      this.renderText(ctx, dateStr, 98, 148, {
+      this.renderText(ctx, dateStr, 98, 138, {
         font: '20px sans-serif',
         color: '#8b949e',
       });
     }
+
+    // Timezone label — small, grayish-blue, below date
+    this.renderText(ctx, tzLabel, 98, 168, {
+      font: '16px sans-serif',
+      color: '#6a8caf',
+    });
 
     $UD.setBaseDataIcon(context, this.canvasToBase64(canvas), '');
   }

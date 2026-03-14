@@ -23,56 +23,60 @@
       "Name": "Clock",
       "UUID": "com.ulanzi.ulanzideck.demo.clock",
       "Tooltip": "Digital clock updated every second",
-      "Icon": "assets/icons/actionIcon.png",
+      "Icon": "assets/icons/clock-icon.png",
       "PropertyInspectorPath": "property-inspector/clock/inspector.html",
       "SupportedInMultiActions": false,
       "state": 0,
       "States": [
-        { "Name": "clock", "Image": "assets/icons/actionIcon.png" }
+        { "Name": "clock", "Image": "assets/icons/clock-icon.png" }
       ]
     },
     {
       "Name": "Counter",
       "UUID": "com.ulanzi.ulanzideck.demo.counter",
       "Tooltip": "Tap to increment. Hold to reset.",
-      "Icon": "assets/icons/actionIcon.png",
+      "Icon": "assets/icons/counter-icon.png",
       "PropertyInspectorPath": "property-inspector/counter/inspector.html",
       "SupportedInMultiActions": false,
       "state": 0,
       "States": [
-        { "Name": "counter", "Image": "assets/icons/actionIcon.png" }
+        { "Name": "counter", "Image": "assets/icons/counter-icon.png" }
       ]
     },
     {
       "Name": "CPU Status",
       "UUID": "com.ulanzi.ulanzideck.demo.status",
       "Tooltip": "CPU usage monitor with alert",
-      "Icon": "assets/icons/actionIcon.png",
+      "Icon": "assets/icons/status-icon.png",
       "PropertyInspectorPath": "property-inspector/status/inspector.html",
       "SupportedInMultiActions": false,
       "state": 0,
       "States": [
-        { "Name": "status", "Image": "assets/icons/actionIcon.png" }
+        { "Name": "status", "Image": "assets/icons/status-icon.png" }
       ]
     },
     {
       "Name": "Calendar",
       "Tooltip": "Today's date in calendar style",
       "UUID": "com.ulanzi.ulanzideck.demo.calendar",
-      "Icon": "assets/icons/actionIcon.png",
+      "Icon": "assets/icons/calendar-icon.png",
       "PropertyInspectorPath": "property-inspector/calendar/inspector.html",
+      "SupportedInMultiActions": false,
+      "state": 0,
       "States": [
-        { "Image": "assets/icons/actionIcon.png", "TitleAlignment": "middle", "FontSize": "14" }
+        { "Name": "calendar", "Image": "assets/icons/calendar-icon.png" }
       ]
     },
     {
       "Name": "Pomodoro",
       "Tooltip": "Pomodoro work/break timer",
       "UUID": "com.ulanzi.ulanzideck.demo.pomodoro",
-      "Icon": "assets/icons/actionIcon.png",
+      "Icon": "assets/icons/pomodoro-icon.png",
       "PropertyInspectorPath": "property-inspector/pomodoro/inspector.html",
+      "SupportedInMultiActions": false,
+      "state": 0,
       "States": [
-        { "Image": "assets/icons/actionIcon.png", "TitleAlignment": "middle", "FontSize": "14" }
+        { "Name": "pomodoro", "Image": "assets/icons/pomodoro-icon.png" }
       ]
     }
   ]
