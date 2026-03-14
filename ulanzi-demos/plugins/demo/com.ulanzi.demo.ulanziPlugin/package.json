@@ -2,7 +2,7 @@
   "name": "com.ulanzi.demo-plugin-tests",
   "private": true,
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=tests/ --forceExit",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=tests/",
     "lint": "eslint plugin/ tests/",
     "lint:fix": "eslint plugin/ tests/ --fix",
     "format": "prettier --write plugin/ tests/",

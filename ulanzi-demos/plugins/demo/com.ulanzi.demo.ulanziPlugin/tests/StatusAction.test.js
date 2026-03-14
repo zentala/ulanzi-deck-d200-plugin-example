@@ -80,7 +80,7 @@ const combinedSrc = [
     }
   };
   const URL    = { createObjectURL: () => 'blob:mock' };
-  class Worker { constructor(){} }
+  class Worker { constructor(){} terminate() {} set onmessage(_fn) {} }
   const fetch  = () => Promise.reject(new Error('fetch not available'));
   `,
   readPlugin('actions/BaseAction.js'),

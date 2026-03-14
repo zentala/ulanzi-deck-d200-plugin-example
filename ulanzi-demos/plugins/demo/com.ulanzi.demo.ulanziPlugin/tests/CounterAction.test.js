@@ -9,8 +9,10 @@ const { BaseAction, CounterAction } = classes;
 
 const CTX = 'counter__ctx__1';
 
+let action;
+
 function makeAction(settings = {}) {
-  const action = new CounterAction();
+  action = new CounterAction();
   action.handleAdd(makeJsn(CTX, 'com.ulanzi.ulanzideck.demo.counter'));
   Object.assign(action._buttons[CTX].settings, settings);
   return action;
@@ -24,6 +26,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  if (action) action.handleClear(CTX);
   patch.restore();
 });
 

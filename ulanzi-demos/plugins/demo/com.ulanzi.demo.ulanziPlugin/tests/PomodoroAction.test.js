@@ -9,8 +9,10 @@ const { BaseAction, PomodoroAction } = classes;
 
 const CTX = 'pomodoro__ctx__1';
 
+let action;
+
 function makeAction(settings = {}) {
-  const action = new PomodoroAction();
+  action = new PomodoroAction();
   action.handleAdd(makeJsn(CTX, 'com.ulanzi.ulanzideck.demo.pomodoro'));
   Object.assign(action._buttons[CTX].settings, settings);
   return action;
@@ -26,6 +28,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  if (action) action.handleClear(CTX);
   patch.restore();
   jest.useRealTimers();
 });

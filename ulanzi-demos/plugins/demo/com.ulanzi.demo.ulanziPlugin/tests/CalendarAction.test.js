@@ -9,8 +9,10 @@ const { BaseAction, CalendarAction } = classes;
 
 const CTX = 'calendar__ctx__1';
 
+let action;
+
 function makeAction() {
-  const action = new CalendarAction();
+  action = new CalendarAction();
   action.handleAdd(makeJsn(CTX, 'com.ulanzi.ulanzideck.demo.calendar'));
   return action;
 }
@@ -23,6 +25,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  if (action) action.handleClear(CTX);
   patch.restore();
 });
 

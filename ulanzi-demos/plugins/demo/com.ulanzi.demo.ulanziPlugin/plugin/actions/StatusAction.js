@@ -229,6 +229,10 @@ class StatusAction extends BaseAction {
     delete this._cpu[context];
     delete this._temp[context];
     delete this._alerted[context];
+    if (Object.keys(this._buttons).length === 0 && this._worker) {
+      this._worker.terminate();
+      this._worker = null;
+    }
   }
 
   _restartInterval(context) {

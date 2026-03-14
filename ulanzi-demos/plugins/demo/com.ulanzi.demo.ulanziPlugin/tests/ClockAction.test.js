@@ -9,8 +9,10 @@ const { BaseAction, ClockAction } = classes;
 
 const CTX = 'clock__ctx__1';
 
+let action;
+
 function makeAction() {
-  const action = new ClockAction();
+  action = new ClockAction();
   action.handleAdd(makeJsn(CTX, 'com.ulanzi.ulanzideck.demo.clock'));
   return action;
 }
@@ -23,6 +25,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  if (action) action.handleClear(CTX);
   patch.restore();
 });
 
