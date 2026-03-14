@@ -105,7 +105,14 @@ class BaseAction {
   _startInterval(context, ms, fn) {
     this._stopInterval(context);
     const state = this._buttons[context];
-    if (state) state.intervalId = setInterval(fn, ms);
+    if (state)
+      state.intervalId = setInterval(() => {
+        try {
+          fn();
+        } catch (err) {
+          console.error('[BaseAction] interval error in', this.constructor.name, err);
+        }
+      }, ms);
   }
 
   // --- Abstract (must override) ---

@@ -90,6 +90,7 @@ function createSandbox(actionFiles, exportNames) {
     setInterval,
     clearInterval,
     Promise,
+    Intl,
     Blob: class Blob {},
     performance: { now: () => Date.now() },
     Math,

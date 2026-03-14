@@ -9,7 +9,6 @@
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
-require('./helpers'); // available for future use
 
 const PLUGIN_DIR = path.join(__dirname, '..', 'plugin');
 const read = (rel) => fs.readFileSync(path.join(PLUGIN_DIR, rel), 'utf8');

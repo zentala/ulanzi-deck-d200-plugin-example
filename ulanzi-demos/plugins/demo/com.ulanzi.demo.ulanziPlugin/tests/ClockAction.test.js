@@ -202,3 +202,35 @@ describe('ClockAction – timezone', () => {
     expect(texts.some((t) => t.startsWith('JKT'))).toBe(true);
   });
 });
+
+describe('ClockAction – Intl compatibility (old Chromium/Electron simulation)', () => {
+  // Regression test: older Electron/Chromium does not support timeZoneName:'shortOffset'.
+  // If render() uses an unsupported Intl option it throws silently and setBaseDataIcon
+  // is never called — leaving the button stuck on the static manifest icon.
+  test('render still calls setBaseDataIcon when Intl.DateTimeFormat throws on unknown timeZoneName', () => {
+    const OriginalIntl = sandbox.Intl;
+    // Simulate old Chromium: throw RangeError for any unknown timeZoneName option
+    sandbox.Intl = {
+      DateTimeFormat: function (locale, opts) {
+        if (
+          opts &&
+          opts.timeZoneName &&
+          opts.timeZoneName !== 'short' &&
+          opts.timeZoneName !== 'long'
+        ) {
+          throw new RangeError('invalid timeZoneName: ' + opts.timeZoneName);
+        }
+        return new OriginalIntl.DateTimeFormat(locale, opts);
+      },
+    };
+    sandbox.Intl.DateTimeFormat.supportedLocalesOf = OriginalIntl.DateTimeFormat.supportedLocalesOf;
+
+    const action = makeAction();
+    sandbox.$UD.setBaseDataIcon.mockClear();
+
+    expect(() => action.render(CTX)).not.toThrow();
+    expect(sandbox.$UD.setBaseDataIcon).toHaveBeenCalled();
+
+    sandbox.Intl = OriginalIntl;
+  });
+});
