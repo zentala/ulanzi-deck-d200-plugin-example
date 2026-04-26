@@ -10,7 +10,7 @@ Ideas not yet planned into an epic. Lightweight list — no ceremony.
 - [ ] Pre-built plugin zip release on GitHub (so non-devs can install without building)
 - [ ] **Upgrade GitHub Actions to Node 24 runtime before 2026-06-02 deadline** — `actions/checkout@v4`, `actions/setup-node@v4`, `actions/setup-python@v5`, `pnpm/action-setup@v4` are deprecated (Node 20). **First step: check library/action compatibility** — verify each action's latest version, that pnpm v10 + lockfile work on the new runtime, that pytest 3.11 setup is unchanged. Only then bump the workflow.
 - [ ] **Add a manifest↔code UUID consistency test** — Jest test that parses `manifest.json` and asserts every action UUID is present in `plugin/uuids.js` and vice versa. Catches drift like the clock inspector having `com.ulanzi.demo.clock` (3-segment) while manifest had `com.ulanzi.ulanzideck.demo.clock` (5-segment) — pre-existing bug fixed during 2026-04-26 rename.
-- [ ] **Enable real `pnpm typecheck` for plugin demo** — currently echoes "skipped (plain JS with runtime globals)". Could use `tsc --checkJs --noEmit` driven by `jsconfig.json` to catch typos in `UUIDS.*` references and missing globals before runtime. Low-priority polish.
+- [x] **Enable real `pnpm typecheck` for plugin demo** — Done in `f5bd304` (merged via `feat/typecheck-real`). Caught 2 latent bugs: `autoPaused` field missing from PomodoroAction JSDoc, `|| {}` fallback masking alert shape in StatusAction. Wired into pre-commit and CI between lint and test.
 
 ## Plugin demo
 
