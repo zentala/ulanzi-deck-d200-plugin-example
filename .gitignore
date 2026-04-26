@@ -16,3 +16,4 @@ coverage/
 # Claude / agent scratch
 .claire/
 .claude/worktrees/
+.gstack/

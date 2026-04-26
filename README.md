@@ -2,6 +2,8 @@
 
 Three working examples of how to control the **Ulanzi Deck D200** smart key display, plus a complete research write-up of the device.
 
+> **Just want to get started?** Most users want **Approach A — Plugin SDK** (skip to [its README](ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin/README.md)). Approach B is for users who want to skip UlanziStudio.
+
 > **Disclaimer**: this is a personal, unofficial example repo. Not affiliated with or endorsed by Ulanzi. The official SDK lives at [UlanziTechnology](https://github.com/UlanziTechnology) and is included here as git submodules.
 
 ## What's the D200?
@@ -21,7 +23,7 @@ A USB-connected stream-deck-style controller with 6 LCD buttons (72×72 px each)
 | Demo location | [`ulanzi-demos/plugins/demo/`](ulanzi-demos/plugins/demo/) | [`ulanzi-demos/usb/demo/`](ulanzi-demos/usb/demo/) | [`ulanzi-demos/shell/demo/`](ulanzi-demos/shell/demo/) |
 | Spec | [`SPEC-A-plugin-sdk.md`](ulanzi-demos/SPEC-A-plugin-sdk.md) | [`SPEC-B-direct-access.md`](ulanzi-demos/SPEC-B-direct-access.md) | [`SPEC-B-direct-access.md`](ulanzi-demos/SPEC-B-direct-access.md) |
 
-For the deep dive on architecture, hardware internals, and full SDK API surface see [`ULANZI-SDK-RESEARCH.md`](ULANZI-SDK-RESEARCH.md).
+For the deep dive on architecture, hardware internals, and full SDK API surface see [`docs/ULANZI-SDK-RESEARCH.md`](docs/ULANZI-SDK-RESEARCH.md).
 
 ## Approach A — Plugin SDK demo (5 actions)
 
@@ -112,6 +114,12 @@ git submodule update --init --recursive
 
 All three demos verified running on a real D200.
 
+## Contributing
+
+PRs welcome — see [CONTRIBUTING.md](CONTRIBUTING.md). Issue reports for setup friction or unclear docs especially appreciated.
+
 ## License
 
-Code in this repository is for educational purposes. The bundled SDK submodules under `libs/` are licensed by [UlanziTechnology](https://github.com/UlanziTechnology) under their own terms (AGPL 3.0 at last check — verify in the upstream repos).
+[MIT](LICENSE) — use freely, keep the copyright notice.
+
+The bundled SDK submodules under `libs/` are licensed by [UlanziTechnology](https://github.com/UlanziTechnology) under their own terms (AGPL 3.0 at last check — verify in the upstream repos).
