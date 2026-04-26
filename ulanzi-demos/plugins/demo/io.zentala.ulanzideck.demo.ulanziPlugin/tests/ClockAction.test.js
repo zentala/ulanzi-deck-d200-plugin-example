@@ -108,19 +108,19 @@ describe('ClockAction – render', () => {
     expect(sandbox.$UD.setBaseDataIcon).toHaveBeenCalledWith(CTX, expect.any(String), '');
   });
 
-  test('renders timezone label PL by default', () => {
+  test('renders default tz1 label (WAW) by default', () => {
     const action = makeAction();
     action.render(CTX);
     const texts = patch.getLastCanvas().texts();
-    expect(texts.some((t) => t.startsWith('PL'))).toBe(true);
+    expect(texts.some((t) => t.startsWith('WAW'))).toBe(true);
   });
 
-  test('renders timezone label JKT after toggle to Jakarta', () => {
+  test('renders default tz2 label (UTC) after toggle', () => {
     const action = makeAction();
     action.onPress(CTX);
     action.render(CTX);
     const texts = patch.getLastCanvas().texts();
-    expect(texts.some((t) => t.startsWith('JKT'))).toBe(true);
+    expect(texts.some((t) => t.startsWith('UTC'))).toBe(true);
   });
 });
 
@@ -140,11 +140,11 @@ describe('ClockAction – interval', () => {
 });
 
 describe('ClockAction – lifecycle', () => {
-  test('handleClear removes _timezone entry for context', () => {
+  test('handleClear removes _slot entry for context', () => {
     const action = makeAction();
-    expect(action._timezone[CTX]).toBeDefined();
+    expect(action._slot[CTX]).toBeDefined();
     action.handleClear(CTX);
-    expect(action._timezone[CTX]).toBeUndefined();
+    expect(action._slot[CTX]).toBeUndefined();
   });
 
   test('onSetActive false stops the interval', () => {
@@ -165,42 +165,50 @@ describe('ClockAction – lifecycle', () => {
 });
 
 describe('ClockAction – timezone', () => {
-  test('initial timezone is PL', () => {
+  test('initial slot is 1 (tz1)', () => {
     const action = makeAction();
-    expect(action._timezone[CTX]).toBe('PL');
+    expect(action._slot[CTX]).toBe(1);
   });
 
-  test('onPress toggles timezone from PL to Asia/Jakarta', () => {
+  test('onPress toggles slot from 1 to 2', () => {
     const action = makeAction();
-    expect(action._timezone[CTX]).toBe('PL');
+    expect(action._slot[CTX]).toBe(1);
     action.onPress(CTX);
-    expect(action._timezone[CTX]).toBe('Asia/Jakarta');
+    expect(action._slot[CTX]).toBe(2);
   });
 
-  test('onPress toggles timezone back from Asia/Jakarta to PL', () => {
+  test('onPress toggles slot back from 2 to 1', () => {
     const action = makeAction();
-    action.onPress(CTX); // PL → Jakarta
-    action.onPress(CTX); // Jakarta → PL
-    expect(action._timezone[CTX]).toBe('PL');
+    action.onPress(CTX); // 1 → 2
+    action.onPress(CTX); // 2 → 1
+    expect(action._slot[CTX]).toBe(1);
   });
 
-  test('render uses Warsaw timezone when PL', () => {
+  test('render produces valid HH:MM in tz1 (default Europe/Warsaw)', () => {
     const action = makeAction();
-    // timezone is PL — render should produce a valid HH:MM string
     action.render(CTX);
     const texts = patch.getLastCanvas().texts();
     const timeText = texts.find((t) => /^\d{2}:\d{2}$/.test(t));
     expect(timeText).toBeDefined();
   });
 
-  test('render uses Jakarta timezone when toggled', () => {
+  test('render produces valid HH:MM in tz2 after toggle (default UTC)', () => {
     const action = makeAction();
-    action.onPress(CTX); // switch to Jakarta
+    action.onPress(CTX); // switch to slot 2
     action.render(CTX);
     const texts = patch.getLastCanvas().texts();
     const timeText = texts.find((t) => /^\d{2}:\d{2}$/.test(t));
     expect(timeText).toBeDefined();
-    expect(texts.some((t) => t.startsWith('JKT'))).toBe(true);
+    expect(texts.some((t) => t.startsWith('UTC'))).toBe(true);
+  });
+
+  test('render honours custom tz1 / tz1Label settings', () => {
+    const action = makeAction();
+    action._buttons[CTX].settings.tz1 = 'America/New_York';
+    action._buttons[CTX].settings.tz1Label = 'NYC';
+    action.render(CTX);
+    const texts = patch.getLastCanvas().texts();
+    expect(texts.some((t) => t.startsWith('NYC'))).toBe(true);
   });
 });
 

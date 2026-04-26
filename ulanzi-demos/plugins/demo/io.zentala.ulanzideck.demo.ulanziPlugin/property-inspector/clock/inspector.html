@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <!--
   Property Inspector: Clock Action
-  Allows users to configure background color, text color, and date display.
+  Configures background, text colors, date toggle, and two IANA timezones
+  the user can flip between with a tap.
 -->
 <html lang="en">
 <head>
@@ -12,12 +13,17 @@
     body { font-family: sans-serif; font-size: 13px; color: #cdd9e5; background: #1c2128; padding: 12px; }
     label { display: block; margin-bottom: 4px; color: #8b949e; }
     .field { margin-bottom: 12px; }
+    .row { display: flex; gap: 8px; }
+    .row > .field { flex: 1; }
     input[type="color"] { width: 100%; height: 32px; border: 1px solid #30363d; border-radius: 4px; background: #0d1117; cursor: pointer; padding: 2px; }
+    input[type="text"] { width: 100%; height: 32px; border: 1px solid #30363d; border-radius: 4px; background: #0d1117; color: #cdd9e5; padding: 0 8px; font-family: 'Courier New', monospace; font-size: 12px; }
     input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
     .checkbox-row { display: flex; align-items: center; gap: 8px; }
+    .hint { font-size: 11px; color: #6e7681; margin-top: 2px; }
     button { width: 100%; padding: 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
     .btn-save { background: #238636; color: #fff; }
     .btn-save:hover { background: #2ea043; }
+    h3 { color: #8b949e; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 0 8px; font-weight: normal; }
   </style>
 </head>
 <body>
@@ -38,7 +44,46 @@
     </div>
   </div>
 
-  <button class="btn-save" id="btnSave">Save</button>
+  <h3>Timezones (tap to toggle)</h3>
+
+  <div class="row">
+    <div class="field">
+      <label for="tz1">Timezone 1 (IANA)</label>
+      <input type="text" id="tz1" list="tz-list" placeholder="Europe/Warsaw" />
+    </div>
+    <div class="field">
+      <label for="tz1Label">Label</label>
+      <input type="text" id="tz1Label" maxlength="4" placeholder="WAW" />
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="field">
+      <label for="tz2">Timezone 2 (IANA)</label>
+      <input type="text" id="tz2" list="tz-list" placeholder="UTC" />
+    </div>
+    <div class="field">
+      <label for="tz2Label">Label</label>
+      <input type="text" id="tz2Label" maxlength="4" placeholder="UTC" />
+    </div>
+  </div>
+  <div class="hint">IANA names: Europe/Warsaw, America/New_York, Asia/Tokyo, UTC, etc.</div>
+
+  <datalist id="tz-list">
+    <option value="UTC"></option>
+    <option value="Europe/Warsaw"></option>
+    <option value="Europe/London"></option>
+    <option value="Europe/Berlin"></option>
+    <option value="America/New_York"></option>
+    <option value="America/Los_Angeles"></option>
+    <option value="America/Chicago"></option>
+    <option value="Asia/Tokyo"></option>
+    <option value="Asia/Shanghai"></option>
+    <option value="Asia/Singapore"></option>
+    <option value="Australia/Sydney"></option>
+  </datalist>
+
+  <button class="btn-save" id="btnSave" style="margin-top: 8px">Save</button>
 
   <script src="../../plugin/libs/js/constants.js"></script>
   <script src="../../plugin/libs/js/eventEmitter.js"></script>
@@ -56,6 +101,10 @@
       if (p.textColor) document.getElementById('textColor').value = p.textColor;
       if (p.showDate !== undefined)
         document.getElementById('showDate').checked = p.showDate;
+      if (p.tz1)       document.getElementById('tz1').value       = p.tz1;
+      if (p.tz1Label)  document.getElementById('tz1Label').value  = p.tz1Label;
+      if (p.tz2)       document.getElementById('tz2').value       = p.tz2;
+      if (p.tz2Label)  document.getElementById('tz2Label').value  = p.tz2Label;
     });
 
     document.getElementById('btnSave').addEventListener('click', () => {
@@ -63,6 +112,10 @@
         bgColor:   document.getElementById('bgColor').value,
         textColor: document.getElementById('textColor').value,
         showDate:  document.getElementById('showDate').checked,
+        tz1:       document.getElementById('tz1').value      || 'Europe/Warsaw',
+        tz1Label:  document.getElementById('tz1Label').value || 'WAW',
+        tz2:       document.getElementById('tz2').value      || 'UTC',
+        tz2Label:  document.getElementById('tz2Label').value || 'UTC',
       });
     });
   </script>

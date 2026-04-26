@@ -1,23 +1,32 @@
 /**
  * @file ClockAction.js
  * @description Digital clock action. Shows date on top, HH:MM large in centre,
- * timezone code + offset at bottom. Animated seconds-progress border (2px, r=6).
- * Updates every second via setInterval. Press to toggle timezone: Warsaw ↔ Jakarta.
+ * timezone label + offset at bottom. Animated seconds-progress border (2px, r=6).
+ * Updates every second via setInterval. Press to toggle between two configurable
+ * timezones (tz1 / tz2 — set via Property Inspector; defaults: Europe/Warsaw and UTC).
  */
 // eslint-disable-next-line no-unused-vars
 class ClockAction extends BaseAction {
   constructor() {
     super();
-    /** @type {Object.<string, string>} context → timezone key ('PL' | 'Asia/Jakarta') */
-    this._timezone = {};
+    /** @type {Object.<string, 1|2>} context → active timezone slot */
+    this._slot = {};
   }
 
   _defaultSettings() {
-    return { bgColor: '#0d1117', textColor: '#ffffff', showDate: true };
+    return {
+      bgColor: '#0d1117',
+      textColor: '#ffffff',
+      showDate: true,
+      tz1: 'Europe/Warsaw',
+      tz1Label: 'WAW',
+      tz2: 'UTC',
+      tz2Label: 'UTC',
+    };
   }
 
   onInit(context) {
-    this._timezone[context] = 'PL';
+    this._slot[context] = 1;
     this._startInterval(context, 1000, () => this.render(context));
     this.render(context);
   }
@@ -32,7 +41,7 @@ class ClockAction extends BaseAction {
   }
 
   onPress(context) {
-    this._timezone[context] = this._timezone[context] === 'PL' ? 'Asia/Jakarta' : 'PL';
+    this._slot[context] = this._slot[context] === 1 ? 2 : 1;
     this.render(context);
   }
 
@@ -42,7 +51,7 @@ class ClockAction extends BaseAction {
 
   handleClear(context) {
     super.handleClear(context);
-    delete this._timezone[context];
+    delete this._slot[context];
   }
 
   render(context) {
@@ -50,8 +59,9 @@ class ClockAction extends BaseAction {
     if (!state) return;
     const s = state.settings;
 
-    const tz = this._timezone[context] || 'PL';
-    const tzName = tz === 'PL' ? 'Europe/Warsaw' : 'Asia/Jakarta';
+    const slot = this._slot[context] || 1;
+    const tzName = slot === 1 ? s.tz1 : s.tz2;
+    const tzLabel = slot === 1 ? s.tz1Label : s.tz2Label;
     const now = new Date();
 
     // HH:MM
@@ -78,10 +88,9 @@ class ClockAction extends BaseAction {
         timeZoneName: 'short',
       })
         .formatToParts(now)
-        .find((p) => p.type === 'timeZoneName')?.value || (tz === 'PL' ? 'CET' : 'WIB');
+        .find((p) => p.type === 'timeZoneName')?.value || tzLabel;
 
-    // Bottom label: "PL · CET" or "JKT · WIB"
-    const tzLabel = tz === 'PL' ? 'PL' : 'JKT';
+    // Bottom label: "WAW · CET" or "UTC · UTC"
     const tzLine = `${tzLabel} · ${tzAbbr}`;
 
     const sec = now.getSeconds();
@@ -149,7 +158,7 @@ class ClockAction extends BaseAction {
       color: s.textColor || '#ffffff',
     });
 
-    // BOTTOM — timezone: "PL · CET+1"
+    // BOTTOM — timezone: "WAW · CET"
     this.renderText(ctx, tzLine, 98, 170, {
       font: "13px 'Courier New', monospace",
       color: '#6a8caf',
