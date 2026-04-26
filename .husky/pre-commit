@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Fast checks on every commit: lint + format inside the plugin folder.
+# Fast checks on every commit: lint + format + typecheck inside the plugin folder.
 # Heavy checks (tests) live in pre-push.
 set -e
 
@@ -15,3 +15,5 @@ echo "→ lint"
 pnpm lint
 echo "→ format check"
 pnpm format:check
+echo "→ typecheck"
+pnpm typecheck

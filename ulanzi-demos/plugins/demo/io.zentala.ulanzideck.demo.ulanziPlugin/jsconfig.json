@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
-    "checkJs": false,
+    "checkJs": true,
     "allowJs": true,
     "strict": false,
     "noEmit": true,
     "target": "ES2022",
-    "lib": ["ES2022", "DOM"],
-    "skipLibCheck": true
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "types": []
   },
-  "include": ["plugin/**/*.js"],
-  "exclude": ["plugin/libs/**", "node_modules/**"]
+  "include": ["plugin/**/*.js", "plugin/types.d.ts"],
+  "exclude": ["plugin/libs/**", "node_modules/**", "libs/**"]
 }
