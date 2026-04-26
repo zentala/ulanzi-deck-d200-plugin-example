@@ -34,6 +34,8 @@ export default [
         StatusAction: 'readonly',
         CalendarAction: 'readonly',
         PomodoroAction: 'readonly',
+        // Shared UUID constants (defined in plugin/uuids.js)
+        UUIDS: 'readonly',
       },
     },
     rules: {
@@ -43,6 +45,15 @@ export default [
       eqeqeq: ['error', 'always'],
       'prefer-const': 'error',
       'no-var': 'error',
+    },
+  },
+  {
+    // uuids.js uses dual-mode export (browser global + CommonJS for Jest)
+    files: ['plugin/uuids.js'],
+    languageOptions: {
+      globals: {
+        module: 'readonly',
+      },
     },
   },
   {
