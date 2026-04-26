@@ -10,36 +10,36 @@ Target repo: ulanzi-demos/plugins/demo/
 
 ---
 
-## 1. Cel i zakres
+## 1. Goal and Scope
 
-### Cel
+### Goal
 
-Stworzyć referencyjne demo pluginu Ulanzi D200 korzystające z oficjalnego SDK (`plugin-common-node`), które:
+Create a reference Ulanzi D200 demo plugin using the official SDK (`plugin-common-node`) that:
 
-- Demonstruje kluczowe możliwości API (Canvas rendering, persistencja ustawień, enkoder, eventy cyklu życia)
-- Służy jako blueprint dla kolejnych pluginów w monorepo
-- Jest w pełni działającym pluginem instalowanym przez UlanziStudio
+- Demonstrates key API capabilities (Canvas rendering, settings persistence, encoder, lifecycle events)
+- Serves as a blueprint for subsequent plugins in the monorepo
+- Is a fully functional plugin installed through UlanziStudio
 
-### Zakres
+### Scope
 
-Trzy akcje dostępne w UlanziStudio jako jeden plugin `io.zentala.ulanzideck.demo`:
+Three actions available in UlanziStudio as a single plugin `io.zentala.ulanzideck.demo`:
 
-| Akcja | UUID | Opis |
+| Action | UUID | Description |
 |---|---|---|
-| ClockAction | `io.zentala.ulanzideck.demo.clock` | Zegar cyfrowy aktualizowany co sekundę |
-| CounterAction | `io.zentala.ulanzideck.demo.counter` | Licznik z konfiguracją kroku i koloru |
-| StatusAction | `io.zentala.ulanzideck.demo.status` | Monitor CPU z alertem progowym |
+| ClockAction | `io.zentala.ulanzideck.demo.clock` | Digital clock updated every second |
+| CounterAction | `io.zentala.ulanzideck.demo.counter` | Counter with step and color configuration |
+| StatusAction | `io.zentala.ulanzideck.demo.status` | CPU monitor with threshold alert |
 
-### Poza zakresem
+### Out of Scope
 
-- Backend server-side (plugin działa lokalnie, bez zewnętrznych API)
-- Wsparcie dla enkodera obrotowego
-- Animowane GIF-y (zamiast tego canvas dynamic rendering)
-- Lokalizacja PL (tylko EN)
+- Server-side backend (plugin runs locally, no external APIs)
+- Rotary encoder support
+- Animated GIFs (use canvas dynamic rendering instead)
+- PL localization (EN only)
 
 ---
 
-## 2. Struktura plików
+## 2. File Structure
 
 ```
 ulanzi-demos/
@@ -58,12 +58,12 @@ ulanzi-demos/
             │   └── plugin-common-html/       # Git submodule
             ├── plugin/
             │   ├── app.html                  # Entry point
-            │   ├── app.js                    # Dispatcher (~80 linii)
+            │   ├── app.js                    # Dispatcher (~80 lines)
             │   └── actions/
-            │       ├── BaseAction.js         # Klasa bazowa (~120 linii)
-            │       ├── ClockAction.js        # Zegar (~100 linii)
-            │       ├── CounterAction.js      # Licznik (~130 linii)
-            │       └── StatusAction.js       # CPU monitor (~150 linii)
+            │       ├── BaseAction.js         # Base class (~120 lines)
+            │       ├── ClockAction.js        # Clock (~100 lines)
+            │       ├── CounterAction.js      # Counter (~130 lines)
+            │       └── StatusAction.js       # CPU monitor (~150 lines)
             └── property-inspector/
                 ├── clock/inspector.html
                 ├── counter/inspector.html
@@ -118,11 +118,11 @@ ulanzi-demos/
 }
 ```
 
-**Uwagi:**
-- `UUID` pluginu: 4 segmenty (konwencja SDK)
-- `UUID` akcji: 5 segmentów
-- `UsePrivateApi: true` wymagane dla `os.cpus()` w StatusAction
-- `CodePath` wskazuje na HTML, nie JS – ograniczenie SDK (kontekst przeglądarki)
+**Notes:**
+- Plugin `UUID`: 4 segments (SDK convention)
+- Action `UUID`: 5 segments
+- `UsePrivateApi: true` required for `os.cpus()` in StatusAction
+- `CodePath` points to HTML, not JS – SDK constraint (browser context)
 
 ---
 
@@ -153,147 +153,147 @@ ulanzi-demos/
 
 ---
 
-## 5. Akcja 1: ClockAction
+## 5. Action 1: ClockAction
 
-### Zachowanie
+### Behavior
 
-- `onAdd`: rejestruje kontekst, uruchamia `setInterval(1000)` per kontekst
-- Co sekundę: generuje canvas 72x72px z aktualnym czasem, wywołuje `setBaseDataIcon`
-- `onSetActive({ active: false })`: zatrzymuje interval; `active: true` – wznawia
-- `onRun`: `$UD.toast('Clock running')` (brak akcji kliknięcia, pedagogicznie)
-- `onClear`: `clearInterval`, usuwa z mapy
+- `onAdd`: registers context, starts `setInterval(1000)` per context
+- Every second: generates 72x72px canvas with current time, calls `setBaseDataIcon`
+- `onSetActive({ active: false })`: stops interval; `active: true` – resumes
+- `onRun`: `$UD.toast('Clock running')` (no tap action, pedagogical)
+- `onClear`: `clearInterval`, removes from map
 
-### Renderowanie canvas 72x72
+### Canvas 72x72 Rendering
 
 ```
-Warstwy:
-1. Tło: gradient #0d1117 → #1a2332
-2. Ramka: #30363d, 1px
-3. Czas "14:32:07": bold 22px monospace, biały, y=32, wyśrodkowany
-4. Data "SUN 14": 12px sans-serif, #8b949e, y=54, wyśrodkowany
+Layers:
+1. Background: gradient #0d1117 → #1a2332
+2. Frame: #30363d, 1px
+3. Time "14:32:07": bold 22px monospace, white, y=32, centered
+4. Date "SUN 14": 12px sans-serif, #8b949e, y=54, centered
 ```
 
 ### Property Inspector
 
-| Pole | Typ | Domyślnie | Klucz |
+| Field | Type | Default | Key |
 |---|---|---|---|
 | Background Color | `<input type="color">` | `#0d1117` | `bgColor` |
 | Text Color | `<input type="color">` | `#ffffff` | `textColor` |
 | Show Seconds | `<input type="checkbox">` | `true` | `showSeconds` |
 | Show Date | `<input type="checkbox">` | `true` | `showDate` |
 
-Przepływ: zmiana → `sendToPlugin(settings)` → `onParamFromApp` → `updateSettings` → re-render
+Flow: change → `sendToPlugin(settings)` → `onParamFromApp` → `updateSettings` → re-render
 
-### Eventy
+### Events
 
-| Event | Reakcja |
+| Event | Reaction |
 |---|---|
-| `onAdd` | Zarejestruj, `getSettings`, start interval |
+| `onAdd` | Register, `getSettings`, start interval |
 | `onSetActive` | Stop/start interval |
-| `onClear` | clearInterval, usuń z mapy |
-| `onParamFromApp` | Aktualizuj ustawienia, `setSettings`, re-render |
-| `onDidReceiveSettings` | Załaduj zapisane ustawienia |
+| `onClear` | clearInterval, remove from map |
+| `onParamFromApp` | Update settings, `setSettings`, re-render |
+| `onDidReceiveSettings` | Load saved settings |
 | `onRun` | toast |
 
 ---
 
-## 6. Akcja 2: CounterAction
+## 6. Action 2: CounterAction
 
-### Zachowanie
+### Behavior
 
-- Licznik per kontekst, wartość startowa: `0`
-- `onRun` (tap): zmień wartość wg `direction * step`
-- `onKeyDown` + hold > 600ms → reset do 0 + `toast('Counter reset')`
-- `onDialRotate`: prawo = `+step`, lewo = `-step`
-- Wartość persystowana przez `setSettings`
+- Counter per context, initial value: `0`
+- `onRun` (tap): change value by `direction * step`
+- `onKeyDown` + hold > 600ms → reset to 0 + `toast('Counter reset')`
+- `onDialRotate`: right = `+step`, left = `-step`
+- Value persisted via `setSettings`
 
-### Renderowanie canvas 72x72
+### Canvas 72x72 Rendering
 
 ```
-Warstwy:
-1. Tło: bgColor (domyślnie #1a1a2e)
-2. Etykieta "COUNTER": 10px, #8b949e, góra
-3. Wartość licznika: bold 28px monospace
+Layers:
+1. Background: bgColor (default #1a1a2e)
+2. Label "COUNTER": 10px, #8b949e, top
+3. Counter value: bold 28px monospace
    - >0: incrementColor (#39d353)
    - <0: decrementColor (#f85149)
    - =0: #8b949e
-4. "step: ±N": 10px, #8b949e, dół
+4. "step: ±N": 10px, #8b949e, bottom
 ```
 
 ### Property Inspector
 
-| Pole | Typ | Domyślnie | Klucz |
+| Field | Type | Default | Key |
 |---|---|---|---|
 | Step | `<input type="number" min="1" max="100">` | `1` | `step` |
 | Direction | `<select>` (Increment/Decrement) | `increment` | `direction` |
 | Background Color | `<input type="color">` | `#1a1a2e` | `bgColor` |
 | Positive Color | `<input type="color">` | `#39d353` | `incrementColor` |
 | Negative Color | `<input type="color">` | `#f85149` | `decrementColor` |
-| Reset Button | `<button>` | — | wysyła `{ action: 'reset' }` |
+| Reset Button | `<button>` | — | sends `{ action: 'reset' }` |
 
-### Eventy
+### Events
 
-| Event | Reakcja |
+| Event | Reaction |
 |---|---|
-| `onAdd` | Zarejestruj, załaduj `value` z `getSettings`, render |
-| `onRun` | Zmień wartość (jeśli `!wasLongPress`), zapisz, render |
-| `onKeyDown` | Zapisz `keyDownTimestamp` |
-| `onKeyUp` | Jeśli elapsed > 600ms → reset, toast, flaga `wasLongPress=true` |
+| `onAdd` | Register, load `value` from `getSettings`, render |
+| `onRun` | Change value (if `!wasLongPress`), save, render |
+| `onKeyDown` | Save `keyDownTimestamp` |
+| `onKeyUp` | If elapsed > 600ms → reset, toast, set `wasLongPress=true` |
 | `onDialRotate` | `±step`, render |
-| `onClear` | Usuń z mapy |
-| `onParamFromApp` | Aktualizuj ustawienia; jeśli `action==='reset'` → value=0 |
-| `onDidReceiveSettings` | Przywróć stan |
+| `onClear` | Remove from map |
+| `onParamFromApp` | Update settings; if `action==='reset'` → value=0 |
+| `onDidReceiveSettings` | Restore state |
 
 ---
 
-## 7. Akcja 3: StatusAction (CPU Monitor)
+## 7. Action 3: StatusAction (CPU Monitor)
 
-### Zachowanie
+### Behavior
 
-- Mierzy CPU usage co `intervalSec` (domyślnie `2s`)
-- Algorytm: dwie próbki `os.cpus()` z różnicą czasu → `(delta_busy / delta_total) * 100`
-- Kolor tła dynamiczny wg progu alertu:
-  - `< alertThreshold`: zielony `#39d353`
-  - `>= alertThreshold && < alertThreshold+20`: żółty `#ffaa00`
-  - `>= alertThreshold+20`: czerwony `#f85149`
-- Gdy `>= alertThreshold`: `showAlert(context)` + jeden toast
+- Measures CPU usage every `intervalSec` (default `2s`)
+- Algorithm: two samples of `os.cpus()` with time delta → `(delta_busy / delta_total) * 100`
+- Dynamic background color by alert threshold:
+  - `< alertThreshold`: green `#39d353`
+  - `>= alertThreshold && < alertThreshold+20`: yellow `#ffaa00`
+  - `>= alertThreshold+20`: red `#f85149`
+- When `>= alertThreshold`: `showAlert(context)` + one toast
 - `onRun`: force-refresh CPU
 
-### Renderowanie canvas 72x72
+### Canvas 72x72 Rendering
 
 ```
-Warstwy:
-1. Tło: dynamiczny kolor (zielony/żółty/czerwony)
-2. Etykieta "CPU": 10px, biały, góra-lewo
-3. Wartość "%": bold 28px monospace, biały, środek
-4. Pasek postępu: 60x6px, y=50
-5. "N cores": 9px, rgba(255,255,255,0.6), prawo-dół
+Layers:
+1. Background: dynamic color (green/yellow/red)
+2. Label "CPU": 10px, white, top-left
+3. Value "%": bold 28px monospace, white, center
+4. Progress bar: 60x6px, y=50
+5. "N cores": 9px, rgba(255,255,255,0.6), bottom-right
 ```
 
 ### Property Inspector
 
-| Pole | Typ | Domyślnie | Klucz |
+| Field | Type | Default | Key |
 |---|---|---|---|
 | Alert Threshold (%) | `<input type="range" min="50" max="95">` | `80` | `alertThreshold` |
 | Update Interval (s) | `<select>` (1s/2s/5s) | `2` | `intervalSec` |
 | Show Core Count | `<input type="checkbox">` | `true` | `showCores` |
 
-Slider pokazuje live wartość (`<span id="thresholdDisplay">`). Zapis przez "Save" button.
+Slider shows live value (`<span id="thresholdDisplay">`). Save via "Save" button.
 
-### Eventy
+### Events
 
-| Event | Reakcja |
+| Event | Reaction |
 |---|---|
-| `onAdd` | Zarejestruj, załaduj ustawienia, zainicjuj pierwszą próbkę CPU, start interval |
+| `onAdd` | Register, load settings, initialize first CPU sample, start interval |
 | `onSetActive` | Stop/start interval |
-| `onClear` | clearInterval, usuń z mapy |
+| `onClear` | clearInterval, remove from map |
 | `onRun` | Force-refresh CPU, render |
-| `onParamFromApp` | Aktualizuj progi, restart interval |
-| `onDidReceiveSettings` | Przywróć ustawienia |
+| `onParamFromApp` | Update thresholds, restart interval |
+| `onDidReceiveSettings` | Restore settings |
 
 ---
 
-## 8. BaseAction.js – interfejs
+## 8. BaseAction.js – Interface
 
 ```javascript
 /**
@@ -304,24 +304,24 @@ Slider pokazuje live wartość (`<span id="thresholdDisplay">`). Zapis przez "Sa
 class BaseAction {
   constructor(api, actionUUID) { ... }
 
-  // Lifecycle – wywoływane przez app.js dispatcher
-  handleAdd(data) { ... }           // rejestruje context, getSettings, wywołuje onInit
-  handleClear(data) { ... }         // clearInterval, usuwa z mapy
+  // Lifecycle – called by app.js dispatcher
+  handleAdd(data) { ... }           // registers context, getSettings, calls onInit
+  handleClear(data) { ... }         // clearInterval, removes from map
   handleSetActive(data) { ... }     // stop/start interval
-  handleRun(data) { ... }           // wywołuje onPress
+  handleRun(data) { ... }           // calls onPress
   handleKeyDown(data) { ... }
   handleKeyUp(data) { ... }
-  handleParams(data) { ... }        // wywołuje onSettings
+  handleParams(data) { ... }        // calls onSettings
   handleDialRotate(data) { ... }
   handleReceiveSettings(data) { ... }
 
   // Canvas utilities
   createCanvas(width = 72, height = 72) { ... }   // → { canvas, ctx }
-  canvasToBase64(canvas) { ... }                   // → base64 string (bez prefixu)
-  renderText(ctx, text, options) { ... }           // wyśrodkowany tekst
+  canvasToBase64(canvas) { ... }                   // → base64 string (without prefix)
+  renderText(ctx, text, options) { ... }           // centered text
   renderProgressBar(ctx, value, max, options) { ... }
 
-  // Abstract – muszą być nadpisane
+  // Abstract – must be overridden
   onInit(context) { throw new Error('Not implemented'); }
   onPress(context) { throw new Error('Not implemented'); }
   onSettings(context, params) { throw new Error('Not implemented'); }
@@ -331,7 +331,7 @@ class BaseAction {
 
 ---
 
-## 9. app.js – dispatcher
+## 9. app.js – Dispatcher
 
 ```javascript
 /**
@@ -347,7 +347,7 @@ import StatusAction from './actions/StatusAction.js';
 const PLUGIN_UUID = 'io.zentala.ulanzideck.demo';
 const $UD = new UlanziApi();
 
-// context → action instance (dla onClear który nie ma pola 'action')
+// context → action instance (for onClear which has no 'action' field)
 const contextRegistry = new Map();
 
 const actions = {
@@ -400,10 +400,10 @@ $UD.onDidReceiveSettings(d => dispatch(d, 'handleReceiveSettings'));
 
 ---
 
-## 11. Diagram przepływu danych
+## 11. Data Flow Diagram
 
 ```
-URZĄDZENIE D200
+D200 DEVICE
      │ USB
      ▼
 ┌─────────────────────────────────┐
@@ -433,7 +433,7 @@ URZĄDZENIE D200
           ▼
    UlanziStudio → USB → D200 LCD
 
-PROPERTY INSPECTOR (iframe w UlanziStudio):
+PROPERTY INSPECTOR (iframe in UlanziStudio):
   inspector.html
   $UD.sendToPlugin(settings)  ──→  onParamFromApp → handleParams
   $UD.onDidReceiveSettings    ←──  sendToPropertyInspector(settings, ctx)
@@ -441,38 +441,38 @@ PROPERTY INSPECTOR (iframe w UlanziStudio):
 
 ---
 
-## 12. Kluczowe decyzje techniczne
+## 12. Key Technical Decisions
 
-**D1: BaseAction zamiast monolitycznego app.js**
-Limit 250 linii/plik wymusza podział. BaseAction eliminuje duplikację lifecycle.
-`app.js` = czysty dispatcher < 80 linii.
+**D1: BaseAction instead of monolithic app.js**
+250-line/file limit enforces separation. BaseAction eliminates lifecycle duplication.
+`app.js` = clean dispatcher < 80 lines.
 
-**D2: CPU measurement przez dwie próbki os.cpus()**
-Pojedyncza próbka = wartości kumulatywne od startu. Dwie próbki z delta = bieżące %.
-`process.cpuUsage()` odrzucone – mierzy tylko bieżący proces.
+**D2: CPU measurement via two os.cpus() samples**
+Single sample = cumulative values from boot. Two samples with delta = current %.
+`process.cpuUsage()` rejected – measures only current process.
 
-**D3: UsePrivateApi: true dla os.cpus()**
-Canvas działa w browser context, ale `os` to Node.js API.
-`UsePrivateApi` umożliwia dostęp przez Electron/NW.js bridge.
-Sprawdź czy require `const os = require('os')` czy import – zależy od plugin-common-node.
+**D3: UsePrivateApi: true for os.cpus()**
+Canvas runs in browser context, but `os` is Node.js API.
+`UsePrivateApi` enables access via Electron/NW.js bridge.
+Check whether require `const os = require('os')` or import – depends on plugin-common-node.
 
-**D4: Osobne setInterval per kontekst w ClockAction**
-Użytkownik może mieć ten sam przycisk na wielu ekranach. Map<context, interval> izoluje każdy.
+**D4: Separate setInterval per context in ClockAction**
+User may have same button on multiple screens. Map<context, interval> isolates each.
 
-**D5: Save button w PI, nie auto-save**
-Auto-save przy każdej zmianie = nadmiarowe setBaseDataIcon calls. Dedykowany Save button.
+**D5: Save button in PI, not auto-save**
+Auto-save on every change = excessive setBaseDataIcon calls. Dedicated Save button.
 
-**D6: Hold-to-reset przez keyDown/keyUp timestamp**
-Brak natywnego long-press w SDK. elapsed > 600ms = reset. Flaga `wasLongPress` blokuje onRun.
+**D6: Hold-to-reset via keyDown/keyUp timestamp**
+No native long-press in SDK. elapsed > 600ms = reset. Flag `wasLongPress` blocks onRun.
 
 **D7: Canvas 72x72px**
-Wynika ze struktury demo analogclock w oficjalnym SDK repo.
+Derives from analogclock demo structure in official SDK repo.
 
 ---
 
-## 13. Zależności
+## 13. Dependencies
 
-| Zależność | Źródło | Metoda |
+| Dependency | Source | Method |
 |---|---|---|
 | `plugin-common-node` | github.com/UlanziTechnology/plugin-common-node | Git submodule |
 | `plugin-common-html` | github.com/UlanziTechnology/plugin-common-html | Git submodule |
@@ -482,23 +482,23 @@ git submodule add https://github.com/UlanziTechnology/plugin-common-node libs/pl
 git submodule add https://github.com/UlanziTechnology/plugin-common-html libs/plugin-common-html
 ```
 
-Brak zewnętrznych npm packages. Canvas API z przeglądarki. `os` z Node.js przez UsePrivateApi.
+No external npm packages. Canvas API from browser. `os` from Node.js via UsePrivateApi.
 
 ---
 
-## 14. Jak uruchomić
+## 14. How to Run
 
-### Lokalizacja folderu pluginów
+### Plugin Folder Location
 
-| OS | Ścieżka |
+| OS | Path |
 |---|---|
 | Windows | `%APPDATA%\UlanziStudio\plugins\` |
 | macOS | `~/Library/Application Support/UlanziStudio/plugins/` |
 
-### Deployment (symlink – wygodne przy dev)
+### Deployment (Symlink – convenient for dev)
 
 ```powershell
-# Windows (PowerShell jako Administrator)
+# Windows (PowerShell as Administrator)
 New-Item -ItemType SymbolicLink `
   -Path "$env:APPDATA\UlanziStudio\plugins\io.zentala.ulanzideck.demo.ulanziPlugin" `
   -Target (Resolve-Path ".\io.zentala.ulanzideck.demo.ulanziPlugin")
@@ -510,46 +510,46 @@ ln -s $(pwd)/io.zentala.ulanzideck.demo.ulanziPlugin \
   ~/Library/Application\ Support/UlanziStudio/plugins/io.zentala.ulanzideck.demo.ulanziPlugin
 ```
 
-### Kroki
+### Steps
 
-1. Zamknij UlanziStudio
-2. Stwórz symlink lub skopiuj folder
-3. Uruchom UlanziStudio
-4. Plugin widoczny w "My Plugins"
-5. Przeciągnij akcję na przycisk D200
-6. Toast "Demo Plugin loaded" = sukces
+1. Close UlanziStudio
+2. Create symlink or copy folder
+3. Launch UlanziStudio
+4. Plugin visible in "My Plugins"
+5. Drag action onto D200 button
+6. Toast "Demo Plugin loaded" = success
 
-### Debugowanie
+### Debugging
 
-Logi: `%APPDATA%\UlanziStudio\logs\` (Windows) lub `~/Library/Application Support/UlanziStudio/logs/` (macOS)
+Logs: `%APPDATA%\UlanziStudio\logs\` (Windows) or `~/Library/Application Support/UlanziStudio/logs/` (macOS)
 
 ---
 
-## 15. Kolejność implementacji
+## 15. Implementation Order
 
 ```
-1. manifest.json + en.json            → plugin widoczny w UI
+1. manifest.json + en.json            → plugin visible in UI
 2. plugin/app.html                    → entry point
-3. libs/ (submoduły)                  → SDK dostępne
+3. libs/ (submodules)                 → SDK available
 4. plugin/app.js (stub: connect + toast onConnected)
-                                      → WERYFIKACJA: toast po załadowaniu
+                                      → VERIFY: toast on load
 5. plugin/actions/BaseAction.js       → shared lifecycle + canvas
-6. plugin/actions/ClockAction.js + dispatch w app.js
-                                      → WERYFIKACJA: zegar na przycisku
+6. plugin/actions/ClockAction.js + dispatch in app.js
+                                      → VERIFY: clock on button
 7. property-inspector/clock/inspector.html
-                                      → WERYFIKACJA: zmiana koloru
+                                      → VERIFY: color change
 8. CounterAction.js + counter/inspector.html
-                                      → WERYFIKACJA: licznik + hold reset
+                                      → VERIFY: counter + hold reset
 9. StatusAction.js + status/inspector.html
-                                      → WERYFIKACJA: CPU + alert kolor
-10. assets/ (PNG 72x72)               → finalne ikony
+                                      → VERIFY: CPU + alert color
+10. assets/ (PNG 72x72)               → final icons
 ```
 
 ---
 
-## 16. Pliki do stworzenia
+## 16. Files to Create
 
-| Plik | Priorytet | Linii est. |
+| File | Priority | Est. Lines |
 |---|---|---|
 | `manifest.json` | P0 | 30 |
 | `en.json` | P0 | 20 |
@@ -562,4 +562,4 @@ Logi: `%APPDATA%\UlanziStudio\logs\` (Windows) lub `~/Library/Application Suppor
 | `property-inspector/clock/inspector.html` | P2 | ~80 |
 | `property-inspector/counter/inspector.html` | P2 | ~100 |
 | `property-inspector/status/inspector.html` | P2 | ~90 |
-| `assets/*.png` (4 pliki) | P3 | binary |
+| `assets/*.png` (4 files) | P3 | binary |

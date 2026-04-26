@@ -1,79 +1,79 @@
-# PRD + Spec Implementacyjny: Ulanzi D200 – Podejście B: Bezpośredni dostęp (bez UlanziStudio)
+# PRD + Implementation Spec: Ulanzi D200 – Approach B: Direct Access (without UlanziStudio)
 
 ```
 Document: SPEC-B-direct-access.md
 Status: READY FOR IMPLEMENTATION
 Version: 1.0.0
 Date: 2026-03-14
-Target repo: ulanzi-demos/usb/demo/ i ulanzi-demos/shell/demo/
+Target repo: ulanzi-demos/usb/demo/ and ulanzi-demos/shell/demo/
 ```
 
 ---
 
-## Spis treści
+## Table of Contents
 
-1. [Kontekst sprzętowy D200](#1-kontekst-sprzętowy-d200)
+1. [D200 Hardware Context](#1-d200-hardware-context)
 2. [B1: Python USB (strmdck) – `/usb/demo/`](#2-b1-python-usb-strmdck)
 3. [B2: ADB Root Shell (framebuffer) – `/shell/demo/`](#3-b2-adb-root-shell-framebuffer)
-4. [Porównanie B1 vs B2](#4-porównanie-b1-vs-b2)
-5. [DDD – Słownik pojęć](#5-ddd--słownik-pojęć)
+4. [B1 vs B2 Comparison](#4-b1-vs-b2-comparison)
+5. [DDD – Glossary of Terms](#5-ddd--glossary-of-terms)
 
 ---
 
-## 1. Kontekst sprzętowy D200
+## 1. D200 Hardware Context
 
-| Parametr | Wartość |
+| Parameter | Value |
 |---|---|
 | CPU | Rockchip RK3308HS, quad-core ARM Cortex-A35 |
-| OS | Linux 5.10.160, kernel z AOSP, userspace Buildroot |
-| Architektura ISA | ARMv7 (32-bit, hard-float) |
-| Przyciski | 13 klawiszy programowalnych LCD |
-| Połączenie PC | USB-C (HID/vendor protocol) |
-| ADB | **Otwarty root shell – fabrycznie!** |
-| Framebuffer | `/dev/fb0` – bezpośredni zapis pikselowy |
-| USB protokół | Niezaszyfrowany, zreverse-engineerowany (Wireshark) |
+| OS | Linux 5.10.160, AOSP kernel, Buildroot userspace |
+| ISA Architecture | ARMv7 (32-bit, hard-float) |
+| Buttons | 13 programmable LCD keys |
+| PC Connection | USB-C (HID/vendor protocol) |
+| ADB | **Open root shell – factory default!** |
+| Framebuffer | `/dev/fb0` – direct pixel write |
+| USB Protocol | Unencrypted, reverse-engineered (Wireshark) |
 
-**Kluczowe odkrycie** (Lucas Teske / Hackaday 2025):
-D200 shipi z otwartym ADB root shellem. Bardzo rzadkie w urządzeniach komercyjnych.
-Umożliwia pełną kontrolę bez exploitów.
+**Key Discovery** (Lucas Teske / Hackaday 2025):
+D200 ships with open ADB root shell. Extremely rare in commercial devices.
+Enables full control without exploits.
 
 ---
 
 ## 2. B1: Python USB (strmdck)
 
-### 2.1 Cel i zakres
+### 2.1 Goal and Scope
 
-**Co demo pokazuje:**
-- Kontrolę D200 z Pythona przez USB, bez UlanziStudio
-- Wyświetlanie dynamicznych ikon (czas, CPU, RAM) na przyciskach
-- Reagowanie na wciśnięcia klawiszy przez callback
-- Living dashboard – kilka przycisków z live data
+**What demo shows:**
+- Control D200 from Python via USB, without UlanziStudio
+- Display dynamic icons (time, CPU, RAM) on buttons
+- Respond to key presses via callback
+- Living dashboard – several buttons with live data
 
-**Co udowadnia:**
-- Możliwość budowania aplikacji na D200 w czystym Pythonie
-- Niezależność od oficjalnego oprogramowania Ulanzi
+**What it proves:**
+- Ability to build applications on D200 in pure Python
+- Independence from official Ulanzi software
 
-**OUT OF SCOPE:** daemon systemowy, multi-device, modyfikacja firmware
+**OUT OF SCOPE:** system daemon, multi-device, firmware modification
 
 ---
 
-### 2.2 Wymagania systemowe
+### 2.2 System Requirements
 
-| Komponent | Wymaganie |
+| Component | Requirement |
 |---|---|
-| Urządzenie | Ulanzi D200 podłączony USB-C |
-| OS hosta | Windows 10/11, macOS 10.13+, Linux kernel 4.x+ |
+| Device | Ulanzi D200 connected via USB-C |
+| Host OS | Windows 10/11, macOS 10.13+, Linux kernel 4.x+ |
 | Python | 3.9+ |
-| USB sterownik (Windows) | WinUSB/libusb-win32 przez Zadig (jeśli brak UlanziStudio) |
-| USB sterownik (Linux) | hidraw lub libusb (out-of-the-box) |
-| USB sterownik (macOS) | IOHIDFamily (wbudowany) |
+| USB Driver (Windows) | WinUSB/libusb-win32 via Zadig (if no UlanziStudio) |
+| USB Driver (Linux) | hidraw or libusb (out-of-the-box) |
+| USB Driver (macOS) | IOHIDFamily (built-in) |
 
-> **UWAGA Windows:** Bez UlanziStudio brak sterownika HID dla D200.
-> Pobierz [Zadig](https://zadig.akeo.ie/) → wybierz Ulanzi D200 → Install WinUSB.
+> **WARNING Windows:** Without UlanziStudio, no HID driver for D200.
+> Download [Zadig](https://zadig.akeo.ie/) → select Ulanzi D200 → Install WinUSB.
 
 ---
 
-### 2.3 Struktura plików
+### 2.3 File Structure
 
 ```
 ulanzi-demos/
@@ -83,19 +83,19 @@ ulanzi-demos/
         ├── pyproject.toml
         ├── src/
         │   └── demo/
-        │       ├── __init__.py       # Eksport: Dashboard, IconGenerator, VERSION
-        │       ├── main.py           # Entry point: args, connect, uruchom Dashboard
+        │       ├── __init__.py       # Export: Dashboard, IconGenerator, VERSION
+        │       ├── main.py           # Entry point: args, connect, run Dashboard
         │       ├── dashboard.py      # Widget loop: Map<key_index, Widget>, update_all()
         │       └── icons.py          # PIL rendering: clock, cpu, ram, text_icon
         └── tests/
             ├── __init__.py
-            ├── test_icons.py         # Unit testy generowania ikon (bez urządzenia)
-            └── test_dashboard.py     # Unit testy dashboardu (mock device)
+            ├── test_icons.py         # Unit tests for icon generation (no device)
+            └── test_dashboard.py     # Unit tests for dashboard (mock device)
 ```
 
 ---
 
-### 2.4 Diagram komunikacji
+### 2.4 Communication Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -111,9 +111,9 @@ ulanzi-demos/
                  ▼
          ┌───────────────────────┐
          │    Ulanzi D200        │
-         │  K0(czas) K1(CPU)     │
+         │  K0(time) K1(CPU)     │
          │  K2(RAM)  K3(msg)     │
-         │  ... (13 klawiszy)    │
+         │  ... (13 buttons)     │
          └───────────────────────┘
 
 Keypress flow:
@@ -123,7 +123,7 @@ Keypress flow:
 
 ---
 
-### 2.5 Kluczowe fragmenty kodu
+### 2.5 Key Code Snippets
 
 #### `src/demo/icons.py`
 
@@ -342,21 +342,21 @@ build-backend = "hatchling.build"
 
 ---
 
-### 2.6 Zależności
+### 2.6 Dependencies
 
-| Pakiet | Min. wersja | Cel |
+| Package | Min. Version | Purpose |
 |---|---|---|
-| `strmdck` | 0.1.0rc1 | USB komunikacja z D200 |
-| `Pillow` | 10.0.0 | Generowanie ikon |
+| `strmdck` | 0.1.0rc1 | USB communication with D200 |
+| `Pillow` | 10.0.0 | Icon generation |
 | `psutil` | 5.9.0 | CPU%, RAM% |
 
 ---
 
-### 2.7 Jak uruchomić
+### 2.7 How to Run
 
 ```bash
-# 1. Podłącz D200 przez USB-C
-# 2. Zamknij UlanziStudio (zwalnia USB)
+# 1. Connect D200 via USB-C
+# 2. Close UlanziStudio (releases USB)
 
 cd ulanzi-demos/usb/demo
 
@@ -366,73 +366,73 @@ source .venv/bin/activate        # Linux/macOS
 
 pip install -e .
 
-# Uruchom
+# Run
 ulanzi-usb-demo --fps 2
 
-# Testy
+# Tests
 pytest
 
-# Windows – brak sterownika? Pobierz Zadig: https://zadig.akeo.ie/
+# Windows – no driver? Download Zadig: https://zadig.akeo.ie/
 # Ulanzi D200 → Install WinUSB
 ```
 
 ---
 
-### 2.8 Ograniczenia i ryzyka
+### 2.8 Limitations and Risks
 
-| Ryzyko | Prawdopodobieństwo | Mitigation |
+| Risk | Probability | Mitigation |
 |---|---|---|
-| Protokół USB zmieniony po firmware update | Średnie | Pinuj wersję firmware; monitoruj strmdck issues |
-| `strmdck` jest pre-release (RC) | Wysokie | Pin wersja w pyproject.toml; wrapper layer izoluje API |
-| Windows: brak sterownika HID | Wysokie (pierwsze uruchomienie) | Dokumentacja Zadig w README |
-| Konkurencja z UlanziStudio o USB | Wysokie | Zamknij UlanziStudio |
-| strmdck ma małą aktywność (18 stars) | Wysokie | Czytaj source, pisz własny wrapper jeśli trzeba |
+| USB protocol changed after firmware update | Medium | Pin firmware version; monitor strmdck issues |
+| `strmdck` is pre-release (RC) | High | Pin version in pyproject.toml; wrapper layer isolates API |
+| Windows: no HID driver | High (first run) | Zadig documentation in README |
+| Conflict with UlanziStudio over USB | High | Close UlanziStudio |
+| strmdck has low activity (18 stars) | High | Read source, write own wrapper if needed |
 
 ---
 
-### 2.9 Kluczowe decyzje techniczne
+### 2.9 Key Technical Decisions
 
-**D1: PIL zamiast HTML Canvas** – headless, bez przeglądarki, Python standard.
+**D1: PIL instead of HTML Canvas** – headless, no browser, Python standard.
 
-**D2: Widget wrapper izoluje strmdck API** – jeden punkt zmiany gdy RC → stable.
+**D2: Widget wrapper isolates strmdck API** – single point of change when RC → stable.
 
-**D3: JPEG (quality=85) zamiast PNG** – mniejszy rozmiar = szybszy USB transfer.
+**D3: JPEG (quality=85) instead of PNG** – smaller size = faster USB transfer.
 
-**D4: FPS=2 domyślnie** – system metrics nie wymagają wysokiego FPS; nie obciąża USB.
+**D4: FPS=2 by default** – system metrics don't require high FPS; doesn't burden USB.
 
-**D5: Graceful shutdown z blank icons** – przy Ctrl+C ekran wraca do stanu domyślnego.
+**D5: Graceful shutdown with blank icons** – on Ctrl+C screen returns to default state.
 
 ---
 
 ## 3. B2: ADB Root Shell (framebuffer)
 
-### 3.1 Cel i zakres
+### 3.1 Goal and Scope
 
-**Co demo pokazuje:**
-- Bezpośredni zapis do `/dev/fb0` na D200 przez ADB
-- Wyświetlanie własnych obrazów na pełnym ekranie urządzenia
-- Prostą animację przez pętlę Python (host) → ADB → framebuffer
-- Możliwość uruchamiania kodu bezpośrednio NA urządzeniu
+**What demo shows:**
+- Direct write to `/dev/fb0` on D200 via ADB
+- Display custom images on full device screen
+- Simple animation via Python loop (host) → ADB → framebuffer
+- Ability to run code directly ON the device
 
-**Co udowadnia:**
-- D200 = pełnoprawny Linux SBC z pełną kontrolą przez ADB root shell
-- Framebuffer pipeline działa: PIL (host) → ADB push → `/dev/fb0`
+**What it proves:**
+- D200 = full-fledged Linux SBC with complete ADB root shell control
+- Framebuffer pipeline works: PIL (host) → ADB push → `/dev/fb0`
 
-**OUT OF SCOPE:** własny kernel, persistent daemon, interaktywne UI z obsługą klawiszy
+**OUT OF SCOPE:** custom kernel, persistent daemon, interactive UI with key handling
 
 ---
 
-### 3.2 Wymagania systemowe
+### 3.2 System Requirements
 
-| Komponent | Wymaganie |
+| Component | Requirement |
 |---|---|
-| Urządzenie | Ulanzi D200 (firmware fabryczny z otwartym ADB) |
-| Połączenie | USB-C do PC |
-| ADB | `adb` w PATH |
-| OS hosta | Windows 10/11, macOS, Linux |
-| Python hosta | 3.9+ |
+| Device | Ulanzi D200 (factory firmware with open ADB) |
+| Connection | USB-C to PC |
+| ADB | `adb` in PATH |
+| Host OS | Windows 10/11, macOS, Linux |
+| Host Python | 3.9+ |
 
-**Instalacja ADB:**
+**Installing ADB:**
 ```bash
 # Windows
 winget install Google.PlatformTools
@@ -444,17 +444,17 @@ brew install android-platform-tools
 sudo apt install adb
 ```
 
-**Weryfikacja:**
+**Verification:**
 ```bash
 adb devices
-# Oczekiwany output:
+# Expected output:
 # List of devices attached
 # XXXXXXXX   device
 ```
 
 ---
 
-### 3.3 Struktura plików
+### 3.3 File Structure
 
 ```
 ulanzi-demos/
@@ -463,15 +463,15 @@ ulanzi-demos/
         ├── README.md
         ├── push.sh                  # Deploy script: check ADB, run display.py
         ├── src/
-        │   ├── display.py           # Generowanie ramek PIL → raw bytes → /dev/fb0
-        │   └── adb_helper.py        # Wrapper ADB: push, shell, push_raw_to_fb, get_fb_info
+        │   ├── display.py           # Generate PIL frames → raw bytes → /dev/fb0
+        │   └── adb_helper.py        # ADB wrapper: push, shell, push_raw_to_fb, get_fb_info
         └── assets/
-            └── frames/              # Wygenerowane ramki PNG (opcjonalne)
+            └── frames/              # Generated PNG frames (optional)
 ```
 
 ---
 
-### 3.4 Diagram komunikacji
+### 3.4 Communication Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -492,19 +492,19 @@ ulanzi-demos/
            │                                │
            │  /dev/fb0 (framebuffer)        │
            │       ↓                        │
-           │  LCD Display (cały ekran)      │
+           │  LCD Display (full screen)     │
            └────────────────────────────────┘
 
-Alternatywa (program na urządzeniu):
+Alternative (program on device):
   HOST → adb push binary → /userdata/my_program
        → adb shell chmod +x /userdata/my_program
        → adb shell /userdata/my_program
-         (działa lokalnie na ARMv7, bezpośredni dostęp do /dev/fb0)
+         (runs locally on ARMv7, direct /dev/fb0 access)
 ```
 
 ---
 
-### 3.5 Kluczowe fragmenty kodu
+### 3.5 Key Code Snippets
 
 #### `src/adb_helper.py`
 
@@ -591,7 +591,7 @@ from PIL import Image, ImageDraw
 from .adb_helper import AdbHelper
 
 
-# PLACEHOLDERS – zweryfikuj przez: adb shell cat /sys/class/graphics/fb0/virtual_size
+# PLACEHOLDERS – verify via: adb shell cat /sys/class/graphics/fb0/virtual_size
 SCREEN_WIDTH = 480
 SCREEN_HEIGHT = 272
 
@@ -749,144 +749,144 @@ python src/display.py --stream --fps "${FPS}"
 
 ---
 
-### 3.6 Zależności
+### 3.6 Dependencies
 
 **Python (host):**
 
-| Pakiet | Min. wersja | Cel |
+| Package | Min. Version | Purpose |
 |---|---|---|
-| `Pillow` | 10.0.0 | Generowanie i skalowanie obrazów |
-| `psutil` | 5.9.0 | Opcjonalnie: metryki systemu |
+| `Pillow` | 10.0.0 | Image generation and scaling |
+| `psutil` | 5.9.0 | Optional: system metrics |
 
 **System tools:**
 
-| Tool | Cel |
+| Tool | Purpose |
 |---|---|
-| `adb` | Android Debug Bridge – komunikacja USB |
-| Python 3.9+ | Uruchomienie display.py |
+| `adb` | Android Debug Bridge – USB communication |
+| Python 3.9+ | Run display.py |
 
-**Na urządzeniu:** nic do instalacji. Busybox `sh`, `cat`, `dd` dostępne out-of-the-box.
+**On device:** nothing to install. Busybox `sh`, `cat`, `dd` available out-of-the-box.
 
 ---
 
-### 3.7 Jak uruchomić
+### 3.7 How to Run
 
 ```bash
-# 1. Zainstaluj ADB:
+# 1. Install ADB:
 #    Windows: winget install Google.PlatformTools
 #    macOS:   brew install android-platform-tools
 #    Linux:   sudo apt install adb
 
-# 2. Podłącz D200 przez USB-C
+# 2. Connect D200 via USB-C
 
-# 3. Zweryfikuj
+# 3. Verify
 adb devices
-# Oczekiwany output: XXXXXXXX   device
+# Expected output: XXXXXXXX   device
 
-# 4. WAŻNE: sprawdź format framebuffera
+# 4. IMPORTANT: check framebuffer format
 adb shell cat /sys/class/graphics/fb0/virtual_size
 adb shell cat /sys/class/graphics/fb0/bits_per_pixel
-# Zaktualizuj SCREEN_WIDTH/HEIGHT w display.py!
+# Update SCREEN_WIDTH/HEIGHT in display.py!
 
-# 5. Zainstaluj zależności
+# 5. Install dependencies
 cd ulanzi-demos/shell/demo
 python -m venv .venv
 source .venv/bin/activate
 pip install Pillow psutil
 
-# 6. Live stream (pulsująca animacja)
+# 6. Live stream (pulsing animation)
 ./push.sh 10
-# lub
+# or
 python src/display.py --stream --fps 10
 
-# 7. Wygeneruj i odtwórz ramki
+# 7. Generate and play frames
 python src/display.py --generate
 python src/display.py --play --fps 30
 
-# --- DIAGNOSTYKA ---
-# Sprawdź czy fb0 jest zapisywalny:
+# --- DIAGNOSTICS ---
+# Check if fb0 is writable:
 adb shell "ls -la /dev/fb0"
 
-# Test ręczny – czarny ekran:
+# Manual test – black screen:
 adb shell "dd if=/dev/zero of=/dev/fb0 bs=1024 count=1000"
 
-# Test – szum (ekran = losowe piksele):
+# Test – noise (screen = random pixels):
 adb shell "cat /dev/urandom | dd of=/dev/fb0 bs=1024 count=200"
 ```
 
 ---
 
-### 3.8 Ograniczenia i ryzyka
+### 3.8 Limitations and Risks
 
-| Ryzyko | Prawdopodobieństwo | Mitigation |
+| Risk | Probability | Mitigation |
 |---|---|---|
-| ADB wyłączony w przyszłym firmware | Niskie-Średnie | Nie aktualizuj firmware bez sprawdzenia changelog |
-| Nieznany format pikseli `/dev/fb0` | Wysokie | `get_fb_info()` autodetekcja z `/sys/` |
-| Nieznana rozdzielczość (PLACEHOLDER!) | Wysokie | Zawsze czytaj `virtual_size` przed pierwszym push |
-| Niska wydajność ADB (latencja 5-15ms/frame) | Wysokie | Max ~10-15 FPS przez ADB; dla 30fps użyj ARM binary |
-| Kolizja z UlanziStudio używającym FB | Wysokie | Zatrzymaj/zamknij UlanziStudio przed testem |
-| Zapis poza rozdzielczość → crash | Średnie | Zawsze weryfikuj rozmiar przez `get_fb_info()` |
+| ADB disabled in future firmware | Low-Medium | Don't update firmware without checking changelog |
+| Unknown `/dev/fb0` pixel format | High | `get_fb_info()` auto-detect from `/sys/` |
+| Unknown resolution (PLACEHOLDER!) | High | Always read `virtual_size` before first push |
+| Low ADB performance (5-15ms latency per frame) | High | Max ~10-15 FPS via ADB; for 30fps use ARM binary |
+| Conflict with UlanziStudio using FB | High | Stop/close UlanziStudio before test |
+| Write outside resolution → crash | Medium | Always verify size via `get_fb_info()` |
 
-**Znane ograniczenia FPS:**
-- ADB overhead: 5-15ms per frame = maks. ~10-20 FPS praktycznie
-- Dla 30fps: własny ARM binary (jak `rlaneth/badustudio` w C++)
-
----
-
-### 3.9 Kluczowe decyzje techniczne
-
-**D1: Host-side rendering (PIL na PC), nie ARM binary.**
-Demo = koncept. ARM cross-kompilacja to dodatkowy toolchain. Dla prod: przenieść do binary.
-
-**D2: `dd of=/dev/fb0` przez `adb shell` z piped stdin.**
-Najniższa latencja – brak pliku pośredniego. Wymaga dokładnie `bpp * w * h` bajtów.
-
-**D3: Autodetekcja formatu przez `/sys/class/graphics/fb0/`.**
-Nie hardkodujemy RGB565 – urządzenie może używać RGBA8888. `get_fb_info()` czyta real values.
-
-**D4: SCREEN_WIDTH/HEIGHT jako PLACEHOLDER wymagające weryfikacji.**
-Dokładne wartości nieznane z dokumentacji. `get_fb_info()` automatycznie je pobierze.
-
-**D5: `--stream` jako główny tryb demo.**
-Live generowanie pokazuje dynamiczność. `--play` dla wysokiego FPS z pre-cached frames.
+**Known FPS Limitations:**
+- ADB overhead: 5-15ms per frame = max ~10-20 FPS practically
+- For 30fps: own ARM binary (like `rlaneth/badustudio` in C++)
 
 ---
 
-## 4. Porównanie B1 vs B2
+### 3.9 Key Technical Decisions
 
-| Kryterium | B1 (Python USB / strmdck) | B2 (ADB Framebuffer) |
+**D1: Host-side rendering (PIL on PC), not ARM binary.**
+Demo = concept. ARM cross-compilation is additional toolchain. For prod: move to binary.
+
+**D2: `dd of=/dev/fb0` via `adb shell` with piped stdin.**
+Lowest latency – no intermediate file. Requires exactly `bpp * w * h` bytes.
+
+**D3: Format auto-detection via `/sys/class/graphics/fb0/`.**
+Don't hardcode RGB565 – device may use RGBA8888. `get_fb_info()` reads real values.
+
+**D4: SCREEN_WIDTH/HEIGHT as PLACEHOLDER requiring verification.**
+Exact values unknown from documentation. `get_fb_info()` automatically fetches them.
+
+**D5: `--stream` as main demo mode.**
+Live generation shows dynamism. `--play` for high FPS with pre-cached frames.
+
+---
+
+## 4. B1 vs B2 Comparison
+
+| Criterion | B1 (Python USB / strmdck) | B2 (ADB Framebuffer) |
 |---|---|---|
-| Połączenie | USB HID vendor protocol | ADB (USB Debug Bridge) |
-| Co kontrolujesz | Per-przycisk (72x72px każdy) | Cały ekran naraz |
-| Wymagania | Python + strmdck | Python + `adb` w PATH |
-| Windows setup | Zadig dla sterownika | SDK Platform Tools |
-| Max FPS | ~30fps | ~10-15fps (ADB); 30fps z ARM binary |
-| Obsługa klawiszy | TAK (natywny callback) | NIE (wymaga osobnego mechanizmu) |
-| Trudność | Średnia | Średnia setup / Wysoka (ARM binary) |
-| Stabilność API | Niska (strmdck RC, community) | Wysoka (ADB + FB = Linux standard) |
-| Ryzyko firmware | Wysokie (USB proto może zmienić) | Niskie-Średnie (ADB może wyłączyć) |
-| "Wow factor" | Dashboard z live data per-key | Pełnoekranowa animacja / DOOM |
+| Connection | USB HID vendor protocol | ADB (USB Debug Bridge) |
+| What you control | Per-button (72x72px each) | Full screen at once |
+| Requirements | Python + strmdck | Python + `adb` in PATH |
+| Windows setup | Zadig for driver | SDK Platform Tools |
+| Max FPS | ~30fps | ~10-15fps (ADB); 30fps w/ ARM binary |
+| Key handling | YES (native callback) | NO (requires separate mechanism) |
+| Difficulty | Medium | Medium setup / High (ARM binary) |
+| API stability | Low (strmdck RC, community) | High (ADB + FB = Linux standard) |
+| Firmware risk | High (USB proto may change) | Low-Medium (ADB may disable) |
+| "Wow factor" | Dashboard w/ live per-key data | Full-screen animation / DOOM |
 
-**Rekomendacja:**
-- Zacznij od **B2** (ADB) – prostszy setup, nie wymaga strmdck RC, ADB = standard
-- Dodaj **B1** gdy strmdck osiągnie stable release
+**Recommendation:**
+- Start with **B2** (ADB) – simpler setup, no strmdck RC, ADB = standard
+- Add **B1** when strmdck reaches stable release
 
 ---
 
-## 5. DDD – Słownik pojęć
+## 5. DDD – Glossary of Terms
 
-| Termin | Definicja |
+| Term | Definition |
 |---|---|
-| **D200** | Ulanzi Stream Controller D200 – urządzenie z 13 programowalnymi przyciskami LCD |
-| **Framebuffer** | `/dev/fb0` – Linux device plikowy = pamięć ekranu; zapis → wyświetlenie |
-| **ADB** | Android Debug Bridge – CLI do komunikacji z urządzeniami Android/Linux przez USB |
-| **Buildroot** | System Linux embedded używany jako userspace D200 |
-| **RGB565** | Format piksela: 16 bitów (R=5b, G=6b, B=5b) |
-| **RGBA8888** | Format piksela: 32 bity (R=8b, G=8b, B=8b, A=8b) |
-| **strmdck** | Community Python library (redphx) do kontroli D200 przez USB bez UlanziStudio |
-| **UlanziStudio** | Oficjalna aplikacja PC Ulanzi – wymagana dla Podejścia A, nie wymagana dla B |
-| **ARMv7** | Architektura ISA procesora D200 (hard-float, 32-bit) |
-| **badustudio** | Projekt rlaneth – Bad Apple 30fps na D200 przez ADB + C++ player |
-| **Widget** | Abstrakcja B1: funkcja renderująca + metadane dla pojedynczego przycisku |
-| **DD** | Unix `dd` – używane do pipe bytes do `/dev/fb0` przez ADB shell |
-| **HID** | Human Interface Device – klasa USB używana przez D200 |
+| **D200** | Ulanzi Stream Controller D200 – device with 13 programmable LCD buttons |
+| **Framebuffer** | `/dev/fb0` – Linux device file = screen memory; write → display |
+| **ADB** | Android Debug Bridge – CLI for device communication via USB |
+| **Buildroot** | Embedded Linux system used as D200 userspace |
+| **RGB565** | Pixel format: 16 bits (R=5b, G=6b, B=5b) |
+| **RGBA8888** | Pixel format: 32 bits (R=8b, G=8b, B=8b, A=8b) |
+| **strmdck** | Community Python library (redphx) to control D200 via USB without UlanziStudio |
+| **UlanziStudio** | Official Ulanzi PC application – required for Approach A, not needed for B |
+| **ARMv7** | ISA architecture of D200 CPU (hard-float, 32-bit) |
+| **badustudio** | Project by rlaneth – Bad Apple 30fps on D200 via ADB + C++ player |
+| **Widget** | Abstraction in B1: render function + metadata for single button |
+| **DD** | Unix `dd` – used to pipe bytes to `/dev/fb0` via ADB shell |
+| **HID** | Human Interface Device – USB class used by D200 |
