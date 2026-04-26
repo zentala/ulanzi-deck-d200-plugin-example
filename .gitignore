@@ -8,3 +8,11 @@ build/
 *.egg-info/
 .env
 assets/frames/*.raw
+
+# Coverage / test artifacts
+.coverage
+coverage/
+
+# Claude / agent scratch
+.claire/
+.claude/worktrees/
