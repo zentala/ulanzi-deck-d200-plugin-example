@@ -34,6 +34,7 @@ export default [
         StatusAction: 'readonly',
         CalendarAction: 'readonly',
         PomodoroAction: 'readonly',
+        WeatherAction: 'readonly',
         // Shared UUID constants (defined in plugin/uuids.js)
         UUIDS: 'readonly',
       },

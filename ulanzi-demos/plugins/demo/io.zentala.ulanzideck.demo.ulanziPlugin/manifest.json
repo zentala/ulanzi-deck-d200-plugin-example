@@ -2,7 +2,7 @@
   "Name": "Ulanzi Demo",
   "Author": "zentala",
   "Version": "1.0.0",
-  "Description": "Demo plugin: clock, counter, CPU status",
+  "Description": "Demo plugin: clock, counter, CPU status, calendar, pomodoro, weather",
   "Icon": "assets/icons/icon.png",
   "Category": "Ulanzi Demo",
   "CategoryIcon": "assets/icons/categoryIcon.png",
@@ -77,6 +77,18 @@
       "state": 0,
       "States": [
         { "Name": "pomodoro", "Image": "assets/icons/pomodoro-icon.png" }
+      ]
+    },
+    {
+      "Name": "Weather",
+      "Tooltip": "Current temperature + condition (open-meteo.com)",
+      "UUID": "io.zentala.ulanzideck.demo.weather",
+      "Icon": "assets/icons/weather-icon.png",
+      "PropertyInspectorPath": "property-inspector/weather/inspector.html",
+      "SupportedInMultiActions": false,
+      "state": 0,
+      "States": [
+        { "Name": "weather", "Image": "assets/icons/weather-icon.png" }
       ]
     }
   ]

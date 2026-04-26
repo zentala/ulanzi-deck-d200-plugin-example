@@ -88,10 +88,24 @@ describe('CalendarAction – render', () => {
 });
 
 describe('CalendarAction – press', () => {
-  test('onPress opens Google Calendar URL', () => {
+  test('onPress opens default Google Calendar URL', () => {
     const action = makeAction();
     action.handleRun(makeJsn(CTX, ''));
     expect(sandbox.$UD.openUrl).toHaveBeenCalledWith('https://calendar.google.com');
+  });
+
+  test('onPress opens custom calendarUrl when configured', () => {
+    const action = makeAction();
+    action._buttons[CTX].settings.calendarUrl = 'https://outlook.live.com/calendar';
+    action.handleRun(makeJsn(CTX, ''));
+    expect(sandbox.$UD.openUrl).toHaveBeenCalledWith('https://outlook.live.com/calendar');
+  });
+
+  test('onPress does nothing when calendarUrl is empty string', () => {
+    const action = makeAction();
+    action._buttons[CTX].settings.calendarUrl = '';
+    action.handleRun(makeJsn(CTX, ''));
+    expect(sandbox.$UD.openUrl).not.toHaveBeenCalled();
   });
 
   test('onPress does not call toast', () => {

@@ -61,4 +61,5 @@ declare const UUIDS: {
   readonly STATUS: string;
   readonly CALENDAR: string;
   readonly POMODORO: string;
+  readonly WEATHER: string;
 };

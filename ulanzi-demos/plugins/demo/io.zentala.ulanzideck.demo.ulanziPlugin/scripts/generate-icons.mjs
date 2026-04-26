@@ -202,4 +202,48 @@ function saveIcon(canvas, filename) {
   saveIcon(canvas, 'pomodoro-icon.png');
 }
 
+// ---------------------------------------------------------------------------
+// Weather icon — sun behind a cloud
+// ---------------------------------------------------------------------------
+{
+  const canvas = createCanvas(64, 64);
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#0a1628';
+  ctx.fillRect(0, 0, 64, 64);
+
+  // Sun (top-right, partially behind cloud)
+  ctx.fillStyle = '#ffd54f';
+  ctx.beginPath();
+  ctx.arc(42, 22, 10, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Sun rays
+  ctx.strokeStyle = '#ffd54f';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  for (let i = 0; i < 8; i++) {
+    const angle = (i * Math.PI) / 4;
+    const x1 = 42 + Math.cos(angle) * 13;
+    const y1 = 22 + Math.sin(angle) * 13;
+    const x2 = 42 + Math.cos(angle) * 17;
+    const y2 = 22 + Math.sin(angle) * 17;
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  }
+
+  // Cloud (overlapping the sun)
+  ctx.fillStyle = '#e8eef7';
+  ctx.beginPath();
+  ctx.arc(22, 38, 9, 0, Math.PI * 2);
+  ctx.arc(32, 34, 11, 0, Math.PI * 2);
+  ctx.arc(42, 38, 9, 0, Math.PI * 2);
+  ctx.arc(32, 44, 12, 0, Math.PI * 2);
+  ctx.fill();
+
+  saveIcon(canvas, 'weather-icon.png');
+}
+
 console.log('All icons generated successfully.');

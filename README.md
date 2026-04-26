@@ -28,19 +28,20 @@ A USB-connected stream-deck-style controller with 6 LCD buttons (72×72 px each)
 
 For the deep dive on architecture, hardware internals, and full SDK API surface see [`docs/ULANZI-SDK-RESEARCH.md`](docs/ULANZI-SDK-RESEARCH.md).
 
-## Approach A — Plugin SDK demo (5 actions)
+## Approach A — Plugin SDK demo (6 actions)
 
-A reference plugin demonstrating canvas rendering, settings persistence, lifecycle events, and Property Inspector wiring across five independent actions:
+A reference plugin demonstrating canvas rendering, settings persistence, lifecycle events, Property Inspector wiring, and HTTP fetch across six independent actions:
 
 | Action | What it does |
 |---|---|
-| **Clock** | Digital HH:MM clock with animated seconds-progress border. Tap toggles Warsaw ↔ Jakarta timezone. |
+| **Clock** | Digital HH:MM clock with animated seconds-progress border. Tap toggles between two configurable IANA timezones (defaults: Europe/Warsaw and UTC). |
 | **Counter** | Tap-to-count with configurable step, direction, and colors. Settings persist. |
 | **CPU Status** | CPU load + temperature monitor with EMA smoothing. Reads [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) HTTP API; falls back to a Web Worker timing benchmark. Configurable overheat threshold + alert. |
-| **Calendar** | Torn-off calendar — day, month name, year, day-of-week. Refreshes at midnight. |
+| **Calendar** | Torn-off calendar — day, month name, year, day-of-week. Refreshes at midnight. Tap opens a configurable calendar URL (Google / Outlook / iCloud / Proton). |
 | **Pomodoro** | Work/break timer state machine. Configurable durations; auto-pauses when the view is hidden. |
+| **Weather** | Current temperature + condition from [open-meteo.com](https://open-meteo.com) (no API key). Configurable location (lat/lon), label, units, refresh interval. |
 
-Stack: plain JS (no module system, browser-style globals), Jest tests in a `vm` sandbox, ESLint + Prettier + Husky pre-commit. UUIDs centralised in [`plugin/uuids.js`](ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin/plugin/uuids.js). 89 unit + dispatcher tests.
+Stack: plain JS (no module system, browser-style globals), Jest tests in a `vm` sandbox, ESLint + Prettier + Husky pre-commit. UUIDs centralised in [`plugin/uuids.js`](ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin/plugin/uuids.js). 123 unit + dispatcher tests.
 
 See [the plugin's own README](ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin/README.md) for installation (symlink instructions per OS).
 
@@ -111,7 +112,7 @@ git submodule update --init --recursive
 
 | Demo | Tests | Build | Linting |
 |---|---|---|---|
-| Plugin SDK | 89 Jest tests, dispatcher + 5 actions | n/a | ESLint + Prettier + Husky |
+| Plugin SDK | 123 Jest tests, dispatcher + 6 actions | n/a | ESLint + Prettier + Husky |
 | USB | pytest with 80% coverage gate | hatchling | ruff |
 | ADB | manual smoke (`push.sh`) | n/a | n/a |
 

@@ -12,7 +12,7 @@ class CalendarAction extends BaseAction {
   }
 
   _defaultSettings() {
-    return {};
+    return { calendarUrl: 'https://calendar.google.com' };
   }
 
   onInit(context) {
@@ -47,8 +47,12 @@ class CalendarAction extends BaseAction {
     delete this._lastDay[context];
   }
 
-  onPress(_context) {
-    $UD.openUrl('https://calendar.google.com');
+  onPress(context) {
+    const state = this._buttons[context];
+    if (!state) return;
+    // Use ?? so an empty string disables the press (|| would fall through to default).
+    const url = state.settings.calendarUrl ?? 'https://calendar.google.com';
+    if (url) $UD.openUrl(url);
   }
 
   render(context) {

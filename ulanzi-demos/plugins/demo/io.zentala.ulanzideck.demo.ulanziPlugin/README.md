@@ -2,17 +2,18 @@
 
 Reference implementation of an Ulanzi D200 plugin using the official SDK.
 Demonstrates canvas rendering, settings persistence, lifecycle event handling,
-and Property Inspector wiring across five independent actions.
+Property Inspector wiring, and HTTP fetch across six independent actions.
 
 ## Actions
 
 | Action | UUID | Description |
 |--------|------|-------------|
-| Clock | `io.zentala.ulanzideck.demo.clock` | Digital clock with animated seconds-progress border. Tap to toggle Warsaw ↔ Jakarta timezone. |
+| Clock | `io.zentala.ulanzideck.demo.clock` | Digital clock with animated seconds-progress border. Tap toggles between two configurable IANA timezones (defaults: Europe/Warsaw and UTC). |
 | Counter | `io.zentala.ulanzideck.demo.counter` | Tap-to-count, configurable step / direction / colors, persisted settings. |
 | CPU Status | `io.zentala.ulanzideck.demo.status` | CPU load + temperature monitor with EMA smoothing. Reads LibreHardwareMonitor HTTP API; falls back to a Web Worker timing benchmark. |
-| Calendar | `io.zentala.ulanzideck.demo.calendar` | Torn-off calendar style — day, month name, year, day-of-week. Refreshes at midnight. |
+| Calendar | `io.zentala.ulanzideck.demo.calendar` | Torn-off calendar style — day, month name, year, day-of-week. Tap opens a configurable calendar URL. |
 | Pomodoro | `io.zentala.ulanzideck.demo.pomodoro` | Work/break timer state machine. Configurable durations; auto-pauses when the view is hidden. |
+| Weather | `io.zentala.ulanzideck.demo.weather` | Current temperature + condition from open-meteo.com (no API key). Configurable location, label, units, refresh interval. |
 
 UUIDs live in [`plugin/uuids.js`](plugin/uuids.js) — single source of truth shared by `app.js`, every Property Inspector, and the Jest tests. Keep in sync with [`manifest.json`](manifest.json).
 
@@ -50,10 +51,10 @@ UUIDs live in [`plugin/uuids.js`](plugin/uuids.js) — single source of truth sh
 
 ```bash
 pnpm install
-pnpm test         # Jest, 89 tests covering every action + dispatcher
+pnpm test         # Jest, 123 tests covering every action + dispatcher + manifest
 pnpm lint
 pnpm format
-pnpm generate-icons   # regenerate the 5 PNG icons via @napi-rs/canvas
+pnpm generate-icons   # regenerate the PNG icons via @napi-rs/canvas
 ```
 
 A Husky pre-commit hook runs lint, format check, typecheck, and tests on staged files.
@@ -82,13 +83,15 @@ io.zentala.ulanzideck.demo.ulanziPlugin/
 │       ├── CounterAction.js
 │       ├── StatusAction.js
 │       ├── CalendarAction.js
-│       └── PomodoroAction.js
+│       ├── PomodoroAction.js
+│       └── WeatherAction.js
 ├── property-inspector/        One folder per action
 │   ├── clock/inspector.html
 │   ├── counter/inspector.html
 │   ├── status/inspector.html
 │   ├── calendar/inspector.html
-│   └── pomodoro/inspector.html
+│   ├── pomodoro/inspector.html
+│   └── weather/inspector.html
 ├── scripts/generate-icons.mjs
-└── tests/                     Jest, 89 tests
+└── tests/                     Jest, 123 tests
 ```

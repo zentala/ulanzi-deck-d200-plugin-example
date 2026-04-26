@@ -11,6 +11,7 @@ const ACTIONS = {
   [UUIDS.STATUS]: new StatusAction(),
   [UUIDS.CALENDAR]: new CalendarAction(),
   [UUIDS.POMODORO]: new PomodoroAction(),
+  [UUIDS.WEATHER]: new WeatherAction(),
 };
 
 /** @type {Object.<string, BaseAction>} context → action (for event routing) */

@@ -11,6 +11,7 @@ const UUIDS = Object.freeze({
   STATUS: 'io.zentala.ulanzideck.demo.status',
   CALENDAR: 'io.zentala.ulanzideck.demo.calendar',
   POMODORO: 'io.zentala.ulanzideck.demo.pomodoro',
+  WEATHER: 'io.zentala.ulanzideck.demo.weather',
 });
 
 if (typeof module !== 'undefined') module.exports = { UUIDS };

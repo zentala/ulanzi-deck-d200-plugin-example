@@ -21,6 +21,7 @@ const ACTION_IDS = {
   status: UUIDS.STATUS,
   calendar: UUIDS.CALENDAR,
   pomodoro: UUIDS.POMODORO,
+  weather: UUIDS.WEATHER,
 };
 
 /** Encode context the same way the real SDK does: uuid___key___actionid */
@@ -115,6 +116,7 @@ const fetch = () => Promise.reject(new Error('fetch not available'));
     read('actions/StatusAction.js'),
     read('actions/CalendarAction.js'),
     read('actions/PomodoroAction.js'),
+    read('actions/WeatherAction.js'),
     read('app.js'),
   ].join('\n');
 
@@ -168,6 +170,13 @@ describe('app.js dispatcher — onAdd routing', () => {
     fire('add', { uuid: ACTION_IDS.pomodoro, context: ctx, param: null });
 
     expect($UD.setBaseDataIcon).toHaveBeenCalledWith(ctx, expect.any(String), expect.any(String));
+  });
+
+  test('routes weather actionid → WeatherAction renders icon on add', () => {
+    const ctx = encodeCtx(ACTION_IDS.weather);
+    fire('add', { uuid: ACTION_IDS.weather, context: ctx, param: null });
+
+    expect($UD.setBaseDataIcon).toHaveBeenCalledWith(ctx, expect.any(String), '');
   });
 
   test('unknown actionid is silently ignored — no render', () => {

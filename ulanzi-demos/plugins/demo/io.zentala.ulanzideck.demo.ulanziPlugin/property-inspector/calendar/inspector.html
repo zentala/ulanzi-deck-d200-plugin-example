@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <!--
   Property Inspector: Calendar Action
-  No configurable settings — displays today's date automatically.
+  Configures the URL opened on press. Defaults to Google Calendar; common
+  alternatives in the datalist (Outlook, Apple iCloud, Proton). Set to empty
+  to disable the press action entirely.
 -->
 <html lang="en">
 <head>
@@ -10,11 +12,30 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: sans-serif; font-size: 13px; color: #cdd9e5; background: #1c2128; padding: 12px; }
-    .note { color: #8b949e; line-height: 1.5; }
+    label { display: block; margin-bottom: 4px; color: #8b949e; }
+    .field { margin-bottom: 12px; }
+    input[type="text"] { width: 100%; height: 32px; border: 1px solid #30363d; border-radius: 4px; background: #0d1117; color: #cdd9e5; padding: 0 8px; font-family: 'Courier New', monospace; font-size: 12px; }
+    .hint { font-size: 11px; color: #6e7681; margin-top: 2px; }
+    button { width: 100%; padding: 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+    .btn-save { background: #238636; color: #fff; }
+    .btn-save:hover { background: #2ea043; }
   </style>
 </head>
 <body>
-  <p class="note">No settings needed. Displays today's date.</p>
+  <div class="field">
+    <label for="calendarUrl">Calendar URL (opened on press)</label>
+    <input type="text" id="calendarUrl" list="cal-list" placeholder="https://calendar.google.com" />
+    <div class="hint">Leave empty to disable the press action.</div>
+  </div>
+
+  <datalist id="cal-list">
+    <option value="https://calendar.google.com"></option>
+    <option value="https://outlook.live.com/calendar"></option>
+    <option value="https://www.icloud.com/calendar"></option>
+    <option value="https://calendar.proton.me"></option>
+  </datalist>
+
+  <button class="btn-save" id="btnSave">Save</button>
 
   <script src="../../plugin/libs/js/constants.js"></script>
   <script src="../../plugin/libs/js/eventEmitter.js"></script>
@@ -24,6 +45,19 @@
   <script src="../../plugin/uuids.js"></script>
   <script>
     $UD.connect(UUIDS.CALENDAR);
+
+    $UD.onParamFromPlugin(jsn => {
+      if (!jsn || !jsn.param) return;
+      if (jsn.param.calendarUrl !== undefined) {
+        document.getElementById('calendarUrl').value = jsn.param.calendarUrl;
+      }
+    });
+
+    document.getElementById('btnSave').addEventListener('click', () => {
+      $UD.sendParamFromPlugin({
+        calendarUrl: document.getElementById('calendarUrl').value,
+      });
+    });
   </script>
 </body>
 </html>

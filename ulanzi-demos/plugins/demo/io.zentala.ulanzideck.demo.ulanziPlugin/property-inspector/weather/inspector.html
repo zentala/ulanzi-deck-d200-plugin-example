@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<!--
+  Property Inspector: Weather Action
+  Configures location (lat/lon), label, unit, and refresh interval.
+  Data source: open-meteo.com — free, no API key.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weather Settings</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; font-size: 13px; color: #cdd9e5; background: #1c2128; padding: 12px; }
+    label { display: block; margin-bottom: 4px; color: #8b949e; }
+    .field { margin-bottom: 12px; }
+    .row { display: flex; gap: 8px; }
+    .row > .field { flex: 1; }
+    input[type="text"], input[type="number"], select {
+      width: 100%; height: 32px; border: 1px solid #30363d; border-radius: 4px;
+      background: #0d1117; color: #cdd9e5; padding: 0 8px;
+      font-family: 'Courier New', monospace; font-size: 12px;
+    }
+    .hint { font-size: 11px; color: #6e7681; margin-top: 2px; }
+    button { width: 100%; padding: 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+    .btn-save { background: #238636; color: #fff; margin-top: 8px; }
+    .btn-save:hover { background: #2ea043; }
+    h3 { color: #8b949e; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin: 16px 0 8px; font-weight: normal; }
+  </style>
+</head>
+<body>
+  <h3>Location</h3>
+  <div class="row">
+    <div class="field">
+      <label for="latitude">Latitude</label>
+      <input type="number" id="latitude" step="0.01" placeholder="52.23" />
+    </div>
+    <div class="field">
+      <label for="longitude">Longitude</label>
+      <input type="number" id="longitude" step="0.01" placeholder="21.01" />
+    </div>
+  </div>
+  <div class="field">
+    <label for="locationLabel">Label</label>
+    <input type="text" id="locationLabel" maxlength="6" placeholder="WAW" />
+    <div class="hint">Up to 6 chars. Tip: nearest airport code (WAW, JFK, NRT…).</div>
+  </div>
+
+  <h3>Display</h3>
+  <div class="row">
+    <div class="field">
+      <label for="units">Units</label>
+      <select id="units">
+        <option value="celsius">°C (metric)</option>
+        <option value="fahrenheit">°F (imperial)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="refreshMin">Refresh (min)</label>
+      <input type="number" id="refreshMin" min="1" max="120" placeholder="15" />
+    </div>
+  </div>
+  <div class="hint">Data: open-meteo.com (no API key required).</div>
+
+  <button class="btn-save" id="btnSave">Save</button>
+
+  <script src="../../plugin/libs/js/constants.js"></script>
+  <script src="../../plugin/libs/js/eventEmitter.js"></script>
+  <script src="../../plugin/libs/js/timers.js"></script>
+  <script src="../../plugin/libs/js/utils.js"></script>
+  <script src="../../plugin/libs/js/ulanzideckApi.js"></script>
+  <script src="../../plugin/uuids.js"></script>
+  <script>
+    $UD.connect(UUIDS.WEATHER);
+
+    $UD.onParamFromPlugin(jsn => {
+      if (!jsn || !jsn.param) return;
+      const p = jsn.param;
+      if (p.latitude  !== undefined) document.getElementById('latitude').value  = p.latitude;
+      if (p.longitude !== undefined) document.getElementById('longitude').value = p.longitude;
+      if (p.locationLabel) document.getElementById('locationLabel').value = p.locationLabel;
+      if (p.units)         document.getElementById('units').value         = p.units;
+      if (p.refreshMin !== undefined) document.getElementById('refreshMin').value = p.refreshMin;
+    });
+
+    document.getElementById('btnSave').addEventListener('click', () => {
+      $UD.sendParamFromPlugin({
+        latitude:      parseFloat(document.getElementById('latitude').value)  || 52.23,
+        longitude:     parseFloat(document.getElementById('longitude').value) || 21.01,
+        locationLabel: document.getElementById('locationLabel').value || 'WAW',
+        units:         document.getElementById('units').value || 'celsius',
+        refreshMin:    parseInt(document.getElementById('refreshMin').value, 10) || 15,
+      });
+    });
+  </script>
+</body>
+</html>
