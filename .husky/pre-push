@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+# Run tests before push.
+# Plugin tests are mandatory (fast, ~1s).
+# USB demo pytest is best-effort (CI is the source of truth for Python).
+set -e
+
+PLUGIN_DIR="ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin"
+USB_DIR="ulanzi-demos/usb/demo"
+
+echo "→ plugin tests"
+( cd "$PLUGIN_DIR" && pnpm test )
+
+if [ -d "$USB_DIR/.venv" ]; then
+  echo "→ USB demo pytest"
+  if [ -x "$USB_DIR/.venv/Scripts/python.exe" ]; then
+    PY="$USB_DIR/.venv/Scripts/python.exe"
+  elif [ -x "$USB_DIR/.venv/bin/python" ]; then
+    PY="$USB_DIR/.venv/bin/python"
+  else
+    PY=""
+  fi
+  if [ -n "$PY" ]; then
+    ( cd "$USB_DIR" && "$PY" -m pytest -q ) || \
+      echo "  ⚠ USB pytest failed locally — CI will be the source of truth. Push continues."
+  else
+    echo "  ⚠ .venv exists but no python binary found — skipping. CI will cover it."
+  fi
+else
+  echo "→ USB demo pytest skipped (no .venv — CI will run it)"
+fi

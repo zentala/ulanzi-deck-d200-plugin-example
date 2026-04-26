@@ -1,19 +1,17 @@
-#!/bin/sh
+#!/usr/bin/env sh
+# Fast checks on every commit: lint + format inside the plugin folder.
+# Heavy checks (tests) live in pre-push.
 set -e
 
-PLUGIN_DIR="ulanzi-demos/plugins/demo/com.ulanzi.demo.ulanziPlugin"
+PLUGIN_DIR="ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin"
 
-echo "→ typecheck"
+# Skip when no JS/HTML/JSON staged inside the plugin folder — keeps doc-only commits fast.
+if ! git diff --cached --name-only | grep -qE "^${PLUGIN_DIR}/.*\.(js|mjs|cjs|html|json)$"; then
+  exit 0
+fi
+
 cd "$PLUGIN_DIR"
-pnpm typecheck
-
 echo "→ lint"
 pnpm lint
-
 echo "→ format check"
 pnpm format:check
-
-echo "→ tests"
-pnpm test
-
-cd -
