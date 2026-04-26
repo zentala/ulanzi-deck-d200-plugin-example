@@ -4,21 +4,19 @@
  * to action handlers by UUID. Uses global $UD (UlanziStreamDeck instance).
  */
 
-const PLUGIN_UUID = 'com.ulanzi.ulanzideck.demo';
-
 /** @type {Object.<string, BaseAction>} UUID → action instance */
 const ACTIONS = {
-  'com.ulanzi.ulanzideck.demo.clock': new ClockAction(),
-  'com.ulanzi.ulanzideck.demo.counter': new CounterAction(),
-  'com.ulanzi.ulanzideck.demo.status': new StatusAction(),
-  'com.ulanzi.ulanzideck.demo.calendar': new CalendarAction(),
-  'com.ulanzi.ulanzideck.demo.pomodoro': new PomodoroAction(),
+  [UUIDS.CLOCK]: new ClockAction(),
+  [UUIDS.COUNTER]: new CounterAction(),
+  [UUIDS.STATUS]: new StatusAction(),
+  [UUIDS.CALENDAR]: new CalendarAction(),
+  [UUIDS.POMODORO]: new PomodoroAction(),
 };
 
 /** @type {Object.<string, BaseAction>} context → action (for event routing) */
 const CONTEXT_MAP = {};
 
-$UD.connect(PLUGIN_UUID);
+$UD.connect(UUIDS.PLUGIN);
 
 $UD.onConnected(() => {
   $UD.toast('Demo Plugin loaded');

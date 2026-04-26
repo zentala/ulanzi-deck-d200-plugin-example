@@ -3,6 +3,7 @@
  * @description Tests for ClockAction rendering and behaviour.
  */
 const { createSandbox, patchCreateCanvas, makeJsn } = require('./helpers');
+const { UUIDS } = require('../plugin/uuids.js');
 
 const { sandbox, classes } = createSandbox(['ClockAction.js'], ['BaseAction', 'ClockAction']);
 const { BaseAction, ClockAction } = classes;
@@ -13,7 +14,7 @@ let action;
 
 function makeAction() {
   action = new ClockAction();
-  action.handleAdd(makeJsn(CTX, 'com.ulanzi.ulanzideck.demo.clock'));
+  action.handleAdd(makeJsn(CTX, UUIDS.CLOCK));
   return action;
 }
 

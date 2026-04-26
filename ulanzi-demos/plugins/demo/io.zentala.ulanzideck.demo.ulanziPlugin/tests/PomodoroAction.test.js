@@ -3,6 +3,7 @@
  * @description Tests for PomodoroAction state machine and render.
  */
 const { createSandbox, patchCreateCanvas, makeJsn } = require('./helpers');
+const { UUIDS } = require('../plugin/uuids.js');
 
 const { sandbox, classes } = createSandbox(['PomodoroAction.js'], ['BaseAction', 'PomodoroAction']);
 const { BaseAction, PomodoroAction } = classes;
@@ -13,7 +14,7 @@ let action;
 
 function makeAction(settings = {}) {
   action = new PomodoroAction();
-  action.handleAdd(makeJsn(CTX, 'com.ulanzi.ulanzideck.demo.pomodoro'));
+  action.handleAdd(makeJsn(CTX, UUIDS.POMODORO));
   Object.assign(action._buttons[CTX].settings, settings);
   return action;
 }

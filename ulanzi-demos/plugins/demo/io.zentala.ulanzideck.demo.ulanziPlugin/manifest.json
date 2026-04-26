@@ -1,12 +1,12 @@
 {
   "Name": "Ulanzi Demo",
-  "Author": "ulanzi-demos",
+  "Author": "zentala",
   "Version": "1.0.0",
   "Description": "Demo plugin: clock, counter, CPU status",
   "Icon": "assets/icons/icon.png",
   "Category": "Ulanzi Demo",
   "CategoryIcon": "assets/icons/categoryIcon.png",
-  "UUID": "com.ulanzi.ulanzideck.demo",
+  "UUID": "io.zentala.ulanzideck.demo",
   "Type": "JavaScript",
   "CodePath": "plugin/app.html",
   "PrivateAPI": true,
@@ -21,7 +21,7 @@
   "Actions": [
     {
       "Name": "Clock",
-      "UUID": "com.ulanzi.ulanzideck.demo.clock",
+      "UUID": "io.zentala.ulanzideck.demo.clock",
       "Tooltip": "Digital clock updated every second",
       "Icon": "assets/icons/clock-icon.png",
       "PropertyInspectorPath": "property-inspector/clock/inspector.html",
@@ -33,7 +33,7 @@
     },
     {
       "Name": "Counter",
-      "UUID": "com.ulanzi.ulanzideck.demo.counter",
+      "UUID": "io.zentala.ulanzideck.demo.counter",
       "Tooltip": "Tap to increment. Hold to reset.",
       "Icon": "assets/icons/counter-icon.png",
       "PropertyInspectorPath": "property-inspector/counter/inspector.html",
@@ -45,7 +45,7 @@
     },
     {
       "Name": "CPU Status",
-      "UUID": "com.ulanzi.ulanzideck.demo.status",
+      "UUID": "io.zentala.ulanzideck.demo.status",
       "Tooltip": "CPU usage monitor with alert",
       "Icon": "assets/icons/status-icon.png",
       "PropertyInspectorPath": "property-inspector/status/inspector.html",
@@ -58,7 +58,7 @@
     {
       "Name": "Calendar",
       "Tooltip": "Today's date in calendar style",
-      "UUID": "com.ulanzi.ulanzideck.demo.calendar",
+      "UUID": "io.zentala.ulanzideck.demo.calendar",
       "Icon": "assets/icons/calendar-icon.png",
       "PropertyInspectorPath": "property-inspector/calendar/inspector.html",
       "SupportedInMultiActions": false,
@@ -70,7 +70,7 @@
     {
       "Name": "Pomodoro",
       "Tooltip": "Pomodoro work/break timer",
-      "UUID": "com.ulanzi.ulanzideck.demo.pomodoro",
+      "UUID": "io.zentala.ulanzideck.demo.pomodoro",
       "Icon": "assets/icons/pomodoro-icon.png",
       "PropertyInspectorPath": "property-inspector/pomodoro/inspector.html",
       "SupportedInMultiActions": false,

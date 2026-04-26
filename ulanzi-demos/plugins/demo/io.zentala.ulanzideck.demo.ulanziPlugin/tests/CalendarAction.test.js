@@ -3,6 +3,7 @@
  * @description Tests for CalendarAction render and press behaviour.
  */
 const { createSandbox, patchCreateCanvas, makeJsn } = require('./helpers');
+const { UUIDS } = require('../plugin/uuids.js');
 
 const { sandbox, classes } = createSandbox(['CalendarAction.js'], ['BaseAction', 'CalendarAction']);
 const { BaseAction, CalendarAction } = classes;
@@ -13,7 +14,7 @@ let action;
 
 function makeAction() {
   action = new CalendarAction();
-  action.handleAdd(makeJsn(CTX, 'com.ulanzi.ulanzideck.demo.calendar'));
+  action.handleAdd(makeJsn(CTX, UUIDS.CALENDAR));
   return action;
 }
 
@@ -139,8 +140,8 @@ describe('CalendarAction – multi-context isolation', () => {
 
   test('two contexts maintain independent _lastDay values', () => {
     const a = new CalendarAction();
-    a.handleAdd(makeJsn(CTX, 'com.ulanzi.ulanzideck.demo.calendar'));
-    a.handleAdd(makeJsn(CTX2, 'com.ulanzi.ulanzideck.demo.calendar'));
+    a.handleAdd(makeJsn(CTX, UUIDS.CALENDAR));
+    a.handleAdd(makeJsn(CTX2, UUIDS.CALENDAR));
 
     a._lastDay[CTX] = 10;
     a._lastDay[CTX2] = 20;

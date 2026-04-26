@@ -1,6 +1,6 @@
-[submodule "ulanzi-demos/plugins/demo/com.ulanzi.demo.ulanziPlugin/libs/plugin-common-node"]
-	path = ulanzi-demos/plugins/demo/com.ulanzi.demo.ulanziPlugin/libs/plugin-common-node
+[submodule "ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin/libs/plugin-common-node"]
+	path = ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin/libs/plugin-common-node
 	url = https://github.com/UlanziTechnology/plugin-common-node
-[submodule "ulanzi-demos/plugins/demo/com.ulanzi.demo.ulanziPlugin/libs/plugin-common-html"]
-	path = ulanzi-demos/plugins/demo/com.ulanzi.demo.ulanziPlugin/libs/plugin-common-html
+[submodule "ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin/libs/plugin-common-html"]
+	path = ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin/libs/plugin-common-html
 	url = https://github.com/UlanziTechnology/plugin-common-html

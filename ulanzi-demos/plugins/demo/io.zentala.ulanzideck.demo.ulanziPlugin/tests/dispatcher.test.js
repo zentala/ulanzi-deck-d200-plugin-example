@@ -13,17 +13,19 @@ const vm = require('vm');
 const PLUGIN_DIR = path.join(__dirname, '..', 'plugin');
 const read = (rel) => fs.readFileSync(path.join(PLUGIN_DIR, rel), 'utf8');
 
+const { UUIDS } = require('../plugin/uuids.js');
+
 const ACTION_IDS = {
-  clock: 'com.ulanzi.ulanzideck.demo.clock',
-  counter: 'com.ulanzi.ulanzideck.demo.counter',
-  status: 'com.ulanzi.ulanzideck.demo.status',
-  calendar: 'com.ulanzi.ulanzideck.demo.calendar',
-  pomodoro: 'com.ulanzi.ulanzideck.demo.pomodoro',
+  clock: UUIDS.CLOCK,
+  counter: UUIDS.COUNTER,
+  status: UUIDS.STATUS,
+  calendar: UUIDS.CALENDAR,
+  pomodoro: UUIDS.POMODORO,
 };
 
 /** Encode context the same way the real SDK does: uuid___key___actionid */
 function encodeCtx(actionid, key = 'k1') {
-  return `com.ulanzi.ulanzideck.demo___${key}___${actionid}`;
+  return `${UUIDS.PLUGIN}___${key}___${actionid}`;
 }
 
 /**
@@ -106,6 +108,7 @@ const fetch = () => Promise.reject(new Error('fetch not available'));
 
   const sources = [
     canvasShim,
+    read('uuids.js'),
     read('actions/BaseAction.js'),
     read('actions/ClockAction.js'),
     read('actions/CounterAction.js'),
@@ -177,7 +180,7 @@ describe('app.js dispatcher — onAdd routing', () => {
   test('plugin UUID as actionid is ignored — catches uuid vs actionid regression', () => {
     // This is the exact bug: passing the plugin UUID (4 segments) instead of
     // the action UUID (5 segments). Should NOT route to any action.
-    const pluginUUID = 'com.ulanzi.ulanzideck.demo';
+    const pluginUUID = UUIDS.PLUGIN;
     const ctx = encodeCtx(pluginUUID);
     fire('add', { uuid: pluginUUID, context: ctx, param: null });
 

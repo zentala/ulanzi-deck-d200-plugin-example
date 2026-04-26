@@ -73,8 +73,9 @@
   <script src="../../plugin/libs/js/timers.js"></script>
   <script src="../../plugin/libs/js/utils.js"></script>
   <script src="../../plugin/libs/js/ulanzideckApi.js"></script>
+  <script src="../../plugin/uuids.js"></script>
   <script>
-    $UD.connect('com.ulanzi.ulanzideck.demo.status');
+    $UD.connect(UUIDS.STATUS);
 
     const cpuInput  = document.getElementById('cpuThreshold');
     const cpuDisp   = document.getElementById('cpuThresholdDisplay');

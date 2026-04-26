@@ -1,5 +1,5 @@
 {
-  "name": "com.ulanzi.demo-plugin-tests",
+  "name": "io.zentala.ulanzideck.demo-plugin-tests",
   "private": true,
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --testPathPattern=tests/",

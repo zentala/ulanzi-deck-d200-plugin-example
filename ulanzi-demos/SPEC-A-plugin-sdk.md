@@ -22,13 +22,13 @@ Stworzyć referencyjne demo pluginu Ulanzi D200 korzystające z oficjalnego SDK 
 
 ### Zakres
 
-Trzy akcje dostępne w UlanziStudio jako jeden plugin `com.ulanzi.demo`:
+Trzy akcje dostępne w UlanziStudio jako jeden plugin `io.zentala.ulanzideck.demo`:
 
 | Akcja | UUID | Opis |
 |---|---|---|
-| ClockAction | `com.ulanzi.demo.clock` | Zegar cyfrowy aktualizowany co sekundę |
-| CounterAction | `com.ulanzi.demo.counter` | Licznik z konfiguracją kroku i koloru |
-| StatusAction | `com.ulanzi.demo.status` | Monitor CPU z alertem progowym |
+| ClockAction | `io.zentala.ulanzideck.demo.clock` | Zegar cyfrowy aktualizowany co sekundę |
+| CounterAction | `io.zentala.ulanzideck.demo.counter` | Licznik z konfiguracją kroku i koloru |
+| StatusAction | `io.zentala.ulanzideck.demo.status` | Monitor CPU z alertem progowym |
 
 ### Poza zakresem
 
@@ -45,7 +45,7 @@ Trzy akcje dostępne w UlanziStudio jako jeden plugin `com.ulanzi.demo`:
 ulanzi-demos/
 └── plugins/
     └── demo/
-        └── com.ulanzi.demo.ulanziPlugin/
+        └── io.zentala.ulanzideck.demo.ulanziPlugin/
             ├── manifest.json
             ├── en.json
             ├── assets/
@@ -80,7 +80,7 @@ ulanzi-demos/
   "Author": "ulanzi-demos",
   "Version": "1.0.0",
   "Description": "Reference demo plugin: clock, counter, CPU status",
-  "UUID": "com.ulanzi.demo",
+  "UUID": "io.zentala.ulanzideck.demo",
   "CodeType": "JavaScript",
   "MinSoftwareVersion": "6.1",
   "CodePath": "plugin/app.html",
@@ -92,7 +92,7 @@ ulanzi-demos/
   "Actions": [
     {
       "Name": "Clock",
-      "UUID": "com.ulanzi.demo.clock",
+      "UUID": "io.zentala.ulanzideck.demo.clock",
       "Tooltip": "Digital clock updated every second",
       "Icon": "assets/clock-action",
       "SupportedInMultiActions": false,
@@ -100,7 +100,7 @@ ulanzi-demos/
     },
     {
       "Name": "Counter",
-      "UUID": "com.ulanzi.demo.counter",
+      "UUID": "io.zentala.ulanzideck.demo.counter",
       "Tooltip": "Tap to increment/decrement. Hold to reset.",
       "Icon": "assets/counter-action",
       "SupportedInMultiActions": false,
@@ -108,7 +108,7 @@ ulanzi-demos/
     },
     {
       "Name": "CPU Status",
-      "UUID": "com.ulanzi.demo.status",
+      "UUID": "io.zentala.ulanzideck.demo.status",
       "Tooltip": "CPU usage monitor with threshold alert",
       "Icon": "assets/status-action",
       "SupportedInMultiActions": false,
@@ -344,16 +344,16 @@ import ClockAction from './actions/ClockAction.js';
 import CounterAction from './actions/CounterAction.js';
 import StatusAction from './actions/StatusAction.js';
 
-const PLUGIN_UUID = 'com.ulanzi.demo';
+const PLUGIN_UUID = 'io.zentala.ulanzideck.demo';
 const $UD = new UlanziApi();
 
 // context → action instance (dla onClear który nie ma pola 'action')
 const contextRegistry = new Map();
 
 const actions = {
-  'com.ulanzi.demo.clock':   new ClockAction($UD, 'com.ulanzi.demo.clock'),
-  'com.ulanzi.demo.counter': new CounterAction($UD, 'com.ulanzi.demo.counter'),
-  'com.ulanzi.demo.status':  new StatusAction($UD, 'com.ulanzi.demo.status'),
+  'io.zentala.ulanzideck.demo.clock':   new ClockAction($UD, 'io.zentala.ulanzideck.demo.clock'),
+  'io.zentala.ulanzideck.demo.counter': new CounterAction($UD, 'io.zentala.ulanzideck.demo.counter'),
+  'io.zentala.ulanzideck.demo.status':  new StatusAction($UD, 'io.zentala.ulanzideck.demo.status'),
 };
 
 function dispatch(data, handlerName) {
@@ -500,14 +500,14 @@ Brak zewnętrznych npm packages. Canvas API z przeglądarki. `os` z Node.js prze
 ```powershell
 # Windows (PowerShell jako Administrator)
 New-Item -ItemType SymbolicLink `
-  -Path "$env:APPDATA\UlanziStudio\plugins\com.ulanzi.demo.ulanziPlugin" `
-  -Target (Resolve-Path ".\com.ulanzi.demo.ulanziPlugin")
+  -Path "$env:APPDATA\UlanziStudio\plugins\io.zentala.ulanzideck.demo.ulanziPlugin" `
+  -Target (Resolve-Path ".\io.zentala.ulanzideck.demo.ulanziPlugin")
 ```
 
 ```bash
 # macOS
-ln -s $(pwd)/com.ulanzi.demo.ulanziPlugin \
-  ~/Library/Application\ Support/UlanziStudio/plugins/com.ulanzi.demo.ulanziPlugin
+ln -s $(pwd)/io.zentala.ulanzideck.demo.ulanziPlugin \
+  ~/Library/Application\ Support/UlanziStudio/plugins/io.zentala.ulanzideck.demo.ulanziPlugin
 ```
 
 ### Kroki

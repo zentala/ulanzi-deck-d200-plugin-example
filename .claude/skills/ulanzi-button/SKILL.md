@@ -13,19 +13,20 @@ Method A uses plain browser JavaScript with no module system. All files are load
 ## File Structure
 
 ```
-com.ulanzi.demo.ulanziPlugin/
+<reverse-dns>.<plugin-name>.ulanziPlugin/
 ├── manifest.json                         # Plugin + action declarations
 ├── plugin/
 │   ├── app.html                          # Entry point; loads all scripts via <script> tags
 │   ├── app.js                            # Routes $UD events → action instances
+│   ├── uuids.js                          # Shared UUID constants (PLUGIN + per-action)
 │   ├── actions/
 │   │   ├── BaseAction.js                 # Abstract base class
-│   │   └── XxxAction.js                 # One file per action
+│   │   └── XxxAction.js                  # One file per action
 │   └── libs/js/
-│       └── ulanzideckApi.js             # SDK — defines $UD global
+│       └── ulanzideckApi.js              # SDK — defines $UD global
 ├── assets/icons/                         # PNG icon files referenced by manifest
 ├── property-inspector/                   # HTML inspector UIs per action
-└── tests/                               # Jest tests (vm sandbox, no browser needed)
+└── tests/                                # Jest tests (vm sandbox, no browser needed)
 ```
 
 ### `plugin/app.html` Script Loading Order

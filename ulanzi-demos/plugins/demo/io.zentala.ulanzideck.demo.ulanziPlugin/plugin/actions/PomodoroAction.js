@@ -36,18 +36,26 @@ class PomodoroAction extends BaseAction {
       total: 0,
       count: 0,
       paused: false,
+      autoPaused: false,
     };
     this.render(context);
   }
 
   onSetActive(context, active) {
+    const ps = this._state[context];
     if (active) {
+      // Resume only if the timer was auto-paused by going inactive (not manually paused)
+      if (ps && ps.autoPaused) {
+        ps.paused = false;
+        ps.autoPaused = false;
+        this._startInterval(context, 1000, () => this._tick(context));
+      }
       this.render(context);
     } else {
-      // Pause the timer if running so it doesn't tick in background
-      const ps = this._state[context];
+      // Auto-pause the timer when view goes inactive (only if not already paused)
       if (ps && ps.state !== 'idle' && !ps.paused) {
         ps.paused = true;
+        ps.autoPaused = true;
         this._stopInterval(context);
       }
     }

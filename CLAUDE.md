@@ -10,7 +10,7 @@ Research + demos for building custom plugins and direct device access for the **
 - `ULANZI-SDK-RESEARCH.md` — main research write-up.
 - `ulanzi-demos/`
   - `SPEC-A-plugin-sdk.md`, `SPEC-B-direct-access.md` — specs for both paths.
-  - `plugins/demo/com.ulanzi.demo.ulanziPlugin/` — demo plugin (Method A). Submodules: `plugin-common-node`, `plugin-common-html`.
+  - `plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin/` — demo plugin (Method A). Submodules: `plugin-common-node`, `plugin-common-html`. UUIDs in `plugin/uuids.js`.
   - `shell/`, `usb/` — direct-access experiments.
 - `.agent/vision/` — long-term vision notes.
 

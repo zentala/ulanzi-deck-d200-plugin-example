@@ -3,6 +3,7 @@
  * @description Tests for CounterAction render and press behaviour.
  */
 const { createSandbox, patchCreateCanvas, makeJsn } = require('./helpers');
+const { UUIDS } = require('../plugin/uuids.js');
 
 const { sandbox, classes } = createSandbox(['CounterAction.js'], ['BaseAction', 'CounterAction']);
 const { BaseAction, CounterAction } = classes;
@@ -13,7 +14,7 @@ let action;
 
 function makeAction(settings = {}) {
   action = new CounterAction();
-  action.handleAdd(makeJsn(CTX, 'com.ulanzi.ulanzideck.demo.counter'));
+  action.handleAdd(makeJsn(CTX, UUIDS.COUNTER));
   Object.assign(action._buttons[CTX].settings, settings);
   return action;
 }

@@ -44,8 +44,9 @@
   <script src="../../plugin/libs/js/timers.js"></script>
   <script src="../../plugin/libs/js/utils.js"></script>
   <script src="../../plugin/libs/js/ulanzideckApi.js"></script>
+  <script src="../../plugin/uuids.js"></script>
   <script>
-    $UD.connect('com.ulanzi.ulanzideck.demo.pomodoro');
+    $UD.connect(UUIDS.POMODORO);
 
     const workInput      = document.getElementById('workMin');
     const workDisplay    = document.getElementById('workMinDisplay');
