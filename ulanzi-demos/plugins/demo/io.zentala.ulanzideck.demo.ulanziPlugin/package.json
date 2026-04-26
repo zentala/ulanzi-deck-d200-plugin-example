@@ -7,7 +7,7 @@
     "lint:fix": "eslint plugin/ tests/ --fix",
     "format": "prettier --write plugin/ tests/",
     "format:check": "prettier --check plugin/ tests/",
-    "typecheck": "echo 'typecheck: skipped (plain JS with runtime globals)'",
+    "typecheck": "tsc -p jsconfig.json",
     "generate-icons": "node scripts/generate-icons.mjs"
   },
   "devDependencies": {

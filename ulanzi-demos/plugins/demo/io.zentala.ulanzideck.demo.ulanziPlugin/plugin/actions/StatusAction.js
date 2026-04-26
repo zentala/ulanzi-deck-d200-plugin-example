@@ -254,7 +254,7 @@ class StatusAction extends BaseAction {
     const s = state.settings;
     const cpu = this._cpu[context];
     const temp = this._temp[context];
-    const al = this._alerted[context] || {};
+    const al = this._alerted[context] || { cpu: false, temp: false };
 
     const { canvas, ctx } = this.createCanvas(196, 196);
 

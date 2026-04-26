@@ -16,7 +16,7 @@ class PomodoroAction extends BaseAction {
     super();
     /**
      * Per-context runtime state (separate from settings stored in _buttons).
-     * @type {Object.<string, {state: string, remaining: number, total: number, count: number, paused: boolean}>}
+     * @type {Object.<string, {state: string, remaining: number, total: number, count: number, paused: boolean, autoPaused: boolean}>}
      */
     this._state = {};
   }
