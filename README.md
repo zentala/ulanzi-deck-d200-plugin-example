@@ -1,5 +1,8 @@
 # ulanzi-deck-d200-plugin-example
 
+[![CI](https://github.com/zentala/ulanzi-deck-d200-plugin-example/actions/workflows/ci.yml/badge.svg)](https://github.com/zentala/ulanzi-deck-d200-plugin-example/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Three working examples of how to control the **Ulanzi Deck D200** smart key display, plus a complete research write-up of the device.
 
 > **Just want to get started?** Most users want **Approach A — Plugin SDK** (skip to [its README](ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin/README.md)). Approach B is for users who want to skip UlanziStudio.
