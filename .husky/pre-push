@@ -1,16 +1,40 @@
 #!/usr/bin/env sh
 # Run tests before push.
-# Plugin tests are mandatory (fast, ~1s).
+# Fast-skip when nothing in the plugin folder or USB demo changed since upstream
+# (doc-only / planning-only pushes don't need to wait on tests).
+# Plugin tests are mandatory when plugin code changed.
 # USB demo pytest is best-effort (CI is the source of truth for Python).
 set -e
 
 PLUGIN_DIR="ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin"
 USB_DIR="ulanzi-demos/usb/demo"
 
-echo "→ plugin tests"
-( cd "$PLUGIN_DIR" && pnpm test )
+# Determine which paths changed in the commits being pushed.
+# Falls back to running tests if we can't compute the range (safer default).
+CHANGED=""
+if git rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
+  CHANGED=$(git diff --name-only '@{upstream}..HEAD' 2>/dev/null || echo "")
+fi
 
-if [ -d "$USB_DIR/.venv" ]; then
+PLUGIN_CHANGED=0
+USB_CHANGED=0
+if [ -n "$CHANGED" ]; then
+  echo "$CHANGED" | grep -qE "^${PLUGIN_DIR}/" && PLUGIN_CHANGED=1
+  echo "$CHANGED" | grep -qE "^${USB_DIR}/"    && USB_CHANGED=1
+else
+  # No upstream range or initial push — run everything to be safe.
+  PLUGIN_CHANGED=1
+  USB_CHANGED=1
+fi
+
+if [ "$PLUGIN_CHANGED" = "1" ]; then
+  echo "→ plugin tests"
+  ( cd "$PLUGIN_DIR" && pnpm test )
+else
+  echo "→ plugin tests skipped (no changes in $PLUGIN_DIR since upstream)"
+fi
+
+if [ "$USB_CHANGED" = "1" ] && [ -d "$USB_DIR/.venv" ]; then
   echo "→ USB demo pytest"
   if [ -x "$USB_DIR/.venv/Scripts/python.exe" ]; then
     PY="$USB_DIR/.venv/Scripts/python.exe"
@@ -25,6 +49,6 @@ if [ -d "$USB_DIR/.venv" ]; then
   else
     echo "  ⚠ .venv exists but no python binary found — skipping. CI will cover it."
   fi
-else
+elif [ "$USB_CHANGED" = "1" ]; then
   echo "→ USB demo pytest skipped (no .venv — CI will run it)"
 fi
