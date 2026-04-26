@@ -1,92 +1,92 @@
-# Ulanzi D200 – Kompletny Raport: Własne Pluginy i Kontrola Urządzenia
+# Ulanzi D200 — Complete Report: Custom Plugins and Device Control
 
-> Badane źródła: oficjalne SDK Ulanzi, plugin-common-node, community Home Assistant, Hackaday, redphx/strmdck, rlaneth/badustudio
-> Data: 2026-03-14
+> Sources surveyed: official Ulanzi SDK, plugin-common-node, Home Assistant community, Hackaday, redphx/strmdck, rlaneth/badustudio
+> Date: 2026-03-14
 
 ---
 
-## TL;DR – Dwie drogi
+## TL;DR — Two Paths
 
-| Podejście | Wymaga oficjalnej aplikacji? | Język | Trudność |
+| Approach | Requires the official app? | Language | Difficulty |
 |---|---|---|---|
-| **A) Oficjalny plugin SDK** | TAK (UlanziStudio musi działać) | Node.js / JS | Średnia |
-| **B) Bezpośredni dostęp przez USB/ADB** | NIE | Python / C++ | Wysoka |
+| **A) Official Plugin SDK** | YES (UlanziStudio must be running) | Node.js / JS | Medium |
+| **B) Direct USB/ADB access** | NO | Python / C++ | High |
 
 ---
 
-## Architektura – jak to działa
+## Architecture — How It Works
 
-### Podejście A: Oficjalny Plugin SDK
+### Approach A: Official Plugin SDK
 
 ```
-[Twój plugin Node.js / JS]
+[Your Node.js / JS plugin]
         ↕ WebSocket (localhost, random port)
-[Aplikacja UlanziStudio (PC)]
+[UlanziStudio app (PC)]
         ↕ USB
-[Urządzenie Ulanzi D200]
+[Ulanzi D200 device]
 ```
 
-Aplikacja UlanziStudio jest **wymaganym pośrednikiem** – ona trzyma sterownik USB.
-Twój plugin to osobny proces JS, który komunikuje się z aplikacją przez lokalny WebSocket.
+UlanziStudio is the **required intermediary** — it owns the USB driver.
+Your plugin is a separate JS process that talks to the app over a local WebSocket.
 
-### Podejście B: Bezpośredni dostęp (bez aplikacji)
-
-```
-[Twój skrypt Python / program C++]
-        ↕ USB (HID, niezaszyfrowany protokół)
-[Urządzenie Ulanzi D200]
-```
-
-LUB przez ADB (urządzenie ma otwarty root shell!):
+### Approach B: Direct access (no app)
 
 ```
-[Twój skrypt] → adb push → [D200: Linux Buildroot na Rockchip RK3308HS]
+[Your Python script / C++ binary]
+        ↕ USB (HID, unencrypted protocol)
+[Ulanzi D200 device]
+```
+
+Or via ADB (the device ships with an open root shell):
+
+```
+[Your script] → adb push → [D200: Linux Buildroot on Rockchip RK3308HS]
                               → /dev/fb0 (framebuffer)
-                              → adb shell ./twoj_program
+                              → adb shell ./your_program
 ```
 
 ---
 
-## Sprzęt – co jest w środku D200
+## Hardware — What's Inside the D200
 
 - **CPU**: Quad-core Rockchip RK3308HS
-- **OS**: Linux 5.10.160 (kernel z Androida, userspace Buildroot)
-- **ADB**: **Otwarty root shell** – Ulanzi zostawiło go otwartego fabrycznie!
-- **USB protokół**: Niezaszyfrowany, zrozumiały po sniffingu Wiresharkiem
-- **Framebuffer**: `/dev/fb0` – bezpośredni dostęp do wyświetlacza
+- **OS**: Linux 5.10.160 (Android-derived kernel, Buildroot userspace)
+- **ADB**: **Open root shell** — Ulanzi left it open from the factory
+- **USB protocol**: Unencrypted, decodable from a Wireshark capture
+- **Framebuffer**: `/dev/fb0` — direct access to the display
 
 ---
 
-## PODEJŚCIE A – Oficjalny Plugin SDK (Node.js)
+## APPROACH A — Official Plugin SDK (Node.js)
 
-### 1. Struktura pluginu
+### 1. Plugin structure
 
-Każdy plugin to folder z rozszerzeniem `.ulanziPlugin`:
+Each plugin is a folder with the `.ulanziPlugin` extension:
 
 ```
-com.twojafirma.twojplugin.ulanziPlugin/
-├── manifest.json          ← definicja pluginu
-├── en.json               ← tłumaczenia EN
-├── pl.json               ← tłumaczenia PL (opcjonalne)
-├── assets/               ← ikony, obrazki
-├── libs/                 ← biblioteki (plugin-common-node)
+com.yourcompany.yourplugin.ulanziPlugin/
+├── manifest.json          ← plugin descriptor
+├── en.json                ← EN translations
+├── pl.json                ← PL translations (optional)
+├── assets/                ← icons, images
+├── libs/                  ← libraries (plugin-common-node)
 ├── plugin/
-│   ├── app.html          ← entry point (ładuje app.js)
-│   └── app.js            ← główna logika pluginu
+│   ├── app.html           ← entry point (loads app.js)
+│   └── app.js             ← main plugin logic
 └── property-inspector/
-    └── mojaction/
-        └── inspector.html ← UI konfiguracji przycisku
+    └── myaction/
+        └── inspector.html ← per-button configuration UI
 ```
 
 ### 2. manifest.json
 
 ```json
 {
-  "Name": "Mój Plugin",
-  "Author": "TwojeImie",
+  "Name": "My Plugin",
+  "Author": "YourName",
   "Version": "1.0.0",
-  "Description": "Opis pluginu",
-  "UUID": "com.twojafirma.twojplugin",
+  "Description": "Plugin description",
+  "UUID": "com.yourcompany.yourplugin",
   "CodeType": "JavaScript",
   "MinSoftwareVersion": "6.1",
   "CodePath": "plugin/app.html",
@@ -97,84 +97,84 @@ com.twojafirma.twojplugin.ulanziPlugin/
   ],
   "Actions": [
     {
-      "Name": "Moja Akcja",
-      "UUID": "com.twojafirma.twojplugin.mojaction",
-      "Tooltip": "Co robi ten przycisk",
-      "Icon": "assets/ikona",
+      "Name": "My Action",
+      "UUID": "com.yourcompany.yourplugin.myaction",
+      "Tooltip": "What this button does",
+      "Icon": "assets/icon",
       "SupportedInMultiActions": false,
-      "PropertyInspectorPath": "property-inspector/mojaction/inspector.html"
+      "PropertyInspectorPath": "property-inspector/myaction/inspector.html"
     }
   ]
 }
 ```
 
-**Konwencja UUID:**
-- Plugin (main service): `com.firma.ulanzistudio.nazwaplugin` (4 segmenty)
-- Akcja: `com.firma.ulanzistudio.nazwaplugin.nazwaakcji` (5+ segmentów)
+**UUID convention:**
+- Plugin (main service): `com.company.ulanzistudio.pluginname` (4 segments)
+- Action: `com.company.ulanzistudio.pluginname.actionname` (5+ segments)
 
-### 3. Instalacja SDK
+### 3. SDK installation
 
 ```bash
-# w folderze plugin/
+# inside the plugin folder
 npm install ws
-# skopiuj plugin-common-node do libs/
+# copy plugin-common-node into libs/
 ```
 
-Lub użyj submodułu Git:
+Or use a Git submodule:
 ```bash
 git submodule add https://github.com/UlanziTechnology/plugin-common-node libs/plugin-common-node
 ```
 
-### 4. app.js – pełny przykład
+### 4. app.js — full example
 
 ```javascript
 import UlanziApi, { Utils } from '../libs/plugin-common-node/index.js';
 
 const $UD = new UlanziApi();
-const ACTION_UUID = 'com.twojafirma.twojplugin.mojaction';
+const ACTION_UUID = 'com.yourcompany.yourplugin.myaction';
 
-// Cache aktywnych przycisków: context → dane
+// Cache of active buttons: context → state
 const buttons = new Map();
 
-// === POŁĄCZENIE ===
-$UD.connect('com.twojafirma.twojplugin');
+// === CONNECTION ===
+$UD.connect('com.yourcompany.yourplugin');
 
-// === ZDARZENIA PRZYCHODZĄCE ===
+// === INCOMING EVENTS ===
 
-// Przycisk dodany do layoutu
+// Button added to the layout
 $UD.onAdd((data) => {
   const { context } = data;
   buttons.set(context, { active: false, settings: {} });
   updateButton(context);
 });
 
-// Przycisk naciśnięty
+// Button pressed
 $UD.onRun((data) => {
   const { context } = data;
-  console.log('Naciśnięto:', context);
-  // Twoja logika akcji tutaj
+  console.log('Pressed:', context);
+  // Your action logic here
   doSomething(context);
 });
 
-// Wciśnięcie / puszczenie
+// Press / release
 $UD.onKeyDown((data) => console.log('keyDown', data));
 $UD.onKeyUp((data) => console.log('keyUp', data));
 
-// Aktywacja/deaktywacja (zmiana widoku w aplikacji)
+// Activation / deactivation (view change in the app)
 $UD.onSetActive((data) => {
   const { context, active } = data;
   const btn = buttons.get(context);
   if (btn) btn.active = active;
-  if (active) updateButton(context); // odśwież gdy widoczny
+  if (active) updateButton(context); // refresh when visible
 });
 
-// Przycisk usunięty
+// Button removed
 $UD.onClear((data) => {
-  // data to tablica contextów
+  // data is an array of contexts
   data.forEach(ctx => buttons.delete(ctx));
 });
 
-// Ustawienia zmienione przez Property Inspector
+// Settings changed via the Property Inspector
 $UD.onParamFromApp((data) => {
   const { context, param } = data;
   const btn = buttons.get(context);
@@ -184,34 +184,34 @@ $UD.onParamFromApp((data) => {
   }
 });
 
-// Enkoder obracany (jeśli urządzenie ma pokrętła)
+// Encoder rotated (if the device has dials)
 $UD.onDialRotate((data) => {
-  const { context, direction } = data; // direction: 1 lub -1
-  console.log('Obrót:', direction);
+  const { context, direction } = data; // direction: 1 or -1
+  console.log('Rotate:', direction);
 });
 
-// === WYŚWIETLANIE IKON ===
+// === RENDERING ICONS ===
 
 function updateButton(context) {
-  // Opcja 1: Predefiniowany stan (numerowany styl)
-  $UD.setStateIcon(context, 0, 'Tekst');
+  // Option 1: predefined state (numbered style)
+  $UD.setStateIcon(context, 0, 'Text');
 
-  // Opcja 2: Obrazek base64 PNG
-  const base64png = getMyIcon(); // twoja funkcja
-  $UD.setBaseDataIcon(context, base64png, 'Etykieta');
+  // Option 2: base64 PNG image
+  const base64png = getMyIcon(); // your function
+  $UD.setBaseDataIcon(context, base64png, 'Label');
 
-  // Opcja 3: Ścieżka do pliku w folderze pluginu
-  $UD.setPathIcon(context, 'assets/moja_ikona.png', 'Etykieta');
+  // Option 3: file path inside the plugin folder
+  $UD.setPathIcon(context, 'assets/my_icon.png', 'Label');
 
-  // Opcja 4: Animowany GIF (base64)
-  $UD.setGifDataIcon(context, base64gif, 'Animacja');
+  // Option 4: animated GIF (base64)
+  $UD.setGifDataIcon(context, base64gif, 'Animation');
 
-  // Opcja 5: Animowany GIF z pliku
-  $UD.setGifPathIcon(context, 'assets/animacja.gif', 'Animacja');
+  // Option 5: animated GIF from file
+  $UD.setGifPathIcon(context, 'assets/animation.gif', 'Animation');
 }
 
-// === GENEROWANIE WŁASNEJ IKONY (Canvas API) ===
-// Działa w kontekście przeglądarki (app.html ładuje app.js)
+// === GENERATING A CUSTOM ICON (Canvas API) ===
+// Runs in a browser context (app.html loads app.js)
 function generateIcon(text, color) {
   const canvas = document.createElement('canvas');
   canvas.width = 72;
@@ -230,12 +230,12 @@ function generateIcon(text, color) {
   return canvas.toDataURL('image/png').split(',')[1]; // base64
 }
 
-// === IKONA DYNAMICZNA (np. zegar, temperatura) ===
+// === LIVE ICON (e.g. clock, temperature) ===
 function startLiveUpdate(context) {
   setInterval(() => {
     if (!buttons.get(context)?.active) return;
     const now = new Date();
-    const timeStr = now.toLocaleTimeString('pl-PL', {
+    const timeStr = now.toLocaleTimeString('en-GB', {
       hour: '2-digit', minute: '2-digit'
     });
     const icon = generateIcon(timeStr, '#16213e');
@@ -243,7 +243,7 @@ function startLiveUpdate(context) {
   }, 1000);
 }
 
-// === USTAWIENIA (persystencja) ===
+// === SETTINGS (persistence) ===
 
 $UD.onDidReceiveSettings((data) => {
   const { context, param } = data;
@@ -254,27 +254,27 @@ $UD.onDidReceiveSettings((data) => {
 });
 
 function saveSettings(context, settings) {
-  $UD.setSettings(settings, context);       // zapis per-akcja
+  $UD.setSettings(settings, context);       // per-action save
 }
 
 function loadSettings(context) {
-  $UD.getSettings(context);                 // odpowiedź przyjdzie w onDidReceiveSettings
+  $UD.getSettings(context);                 // reply arrives via onDidReceiveSettings
 }
 
 function saveGlobalSettings(settings) {
-  $UD.setGlobalSettings(settings, null);   // współdzielone przez cały plugin
+  $UD.setGlobalSettings(settings, null);    // shared across the whole plugin
 }
 
 // === SYSTEM ===
 
-$UD.toast('Plugin załadowany!');            // powiadomienie popup
-$UD.logMessage('Debug info', 'info');       // logi do pliku
-$UD.showAlert(context);                     // wskaźnik błędu na przycisku
-$UD.hotkey('ctrl+shift+F5');               // wyzwól skrót klawiszowy
-$UD.openUrl('https://example.com');        // otwórz w przeglądarce
+$UD.toast('Plugin loaded!');                // popup notification
+$UD.logMessage('Debug info', 'info');       // file logs
+$UD.showAlert(context);                     // error indicator on the button
+$UD.hotkey('ctrl+shift+F5');                // trigger an OS shortcut
+$UD.openUrl('https://example.com');         // open in browser
 ```
 
-### 5. app.html – entry point
+### 5. app.html — entry point
 
 ```html
 <!DOCTYPE html>
@@ -283,16 +283,16 @@ $UD.openUrl('https://example.com');        // otwórz w przeglądarce
   <meta charset="UTF-8">
 </head>
 <body>
-<!-- Kolejność ładowania ma znaczenie! -->
+<!-- Load order matters! -->
 <script src="../libs/plugin-common-node/index.js"></script>
 <script src="app.js" type="module"></script>
 </body>
 </html>
 ```
 
-### 6. Property Inspector (UI konfiguracji)
+### 6. Property Inspector (configuration UI)
 
-`property-inspector/mojaction/inspector.html` – pojawia się gdy klikniesz przycisk w UlanziStudio:
+`property-inspector/myaction/inspector.html` — shown when you click a button in UlanziStudio:
 
 ```html
 <!DOCTYPE html>
@@ -304,22 +304,22 @@ $UD.openUrl('https://example.com');        // otwórz w przeglądarce
 <body>
   <div class="sdpi-wrapper">
     <div class="sdpi-item">
-      <div class="sdpi-item-label">Kolor tła</div>
+      <div class="sdpi-item-label">Background color</div>
       <input type="color" id="bgColor" class="sdpi-item-value">
     </div>
     <div class="sdpi-item">
-      <div class="sdpi-item-label">Tekst</div>
-      <input type="text" id="labelText" class="sdpi-item-value" placeholder="np. CPU">
+      <div class="sdpi-item-label">Label</div>
+      <input type="text" id="labelText" class="sdpi-item-value" placeholder="e.g. CPU">
     </div>
-    <button id="saveBtn">Zapisz</button>
+    <button id="saveBtn">Save</button>
   </div>
 
   <script src="../../libs/plugin-common-node/index.js"></script>
   <script>
     const $UD = new UlanziApi();
-    $UD.connect('com.twojafirma.twojplugin');
+    $UD.connect('com.yourcompany.yourplugin');
 
-    // Odbierz aktualne ustawienia
+    // Receive the current settings
     $UD.onDidReceiveSettings((data) => {
       if (data.param?.bgColor) {
         document.getElementById('bgColor').value = data.param.bgColor;
@@ -329,7 +329,7 @@ $UD.openUrl('https://example.com');        // otwórz w przeglądarce
       }
     });
 
-    // Wyślij ustawienia do głównego pluginu
+    // Send settings to the main plugin
     document.getElementById('saveBtn').addEventListener('click', () => {
       const settings = {
         bgColor: document.getElementById('bgColor').value,
@@ -342,133 +342,133 @@ $UD.openUrl('https://example.com');        // otwórz w przeglądarce
 </html>
 ```
 
-### 7. Kompletne API – wszystkie metody
+### 7. Complete API — every method
 
-#### Wyświetlanie
+#### Rendering
 
-| Metoda | Opis |
-|--------|------|
-| `setStateIcon(ctx, stateIndex, text)` | Predefiniowany styl nr N |
-| `setBaseDataIcon(ctx, base64, text)` | Obrazek PNG jako base64 |
-| `setPathIcon(ctx, path, text)` | Obrazek z pliku (względna ścieżka) |
-| `setGifDataIcon(ctx, base64, text)` | GIF animowany (base64) |
-| `setGifPathIcon(ctx, path, text)` | GIF animowany z pliku |
+| Method | Description |
+|--------|-------------|
+| `setStateIcon(ctx, stateIndex, text)` | Predefined style #N |
+| `setBaseDataIcon(ctx, base64, text)` | PNG image as base64 |
+| `setPathIcon(ctx, path, text)` | Image from file (relative path) |
+| `setGifDataIcon(ctx, base64, text)` | Animated GIF (base64) |
+| `setGifPathIcon(ctx, path, text)` | Animated GIF from file |
 
-#### Komunikacja
+#### Communication
 
-| Metoda | Opis |
-|--------|------|
-| `sendParamFromPlugin(settings, ctx)` | Plugin → Aplikacja (persist) |
+| Method | Description |
+|--------|-------------|
+| `sendParamFromPlugin(settings, ctx)` | Plugin → App (persisted) |
 | `sendToPropertyInspector(settings, ctx)` | Plugin → Inspector (transient) |
 | `sendToPlugin(settings)` | Inspector → Plugin |
 
-#### Ustawienia
+#### Settings
 
-| Metoda | Opis |
-|--------|------|
-| `setSettings(obj, ctx)` | Zapisz ustawienia akcji |
-| `getSettings(ctx)` | Pobierz ustawienia akcji |
-| `setGlobalSettings(obj, ctx)` | Zapisz globalne ustawienia pluginu |
-| `getGlobalSettings(ctx)` | Pobierz globalne |
+| Method | Description |
+|--------|-------------|
+| `setSettings(obj, ctx)` | Save action settings |
+| `getSettings(ctx)` | Load action settings |
+| `setGlobalSettings(obj, ctx)` | Save plugin-wide settings |
+| `getGlobalSettings(ctx)` | Load plugin-wide settings |
 
 #### System
 
-| Metoda | Opis |
-|--------|------|
-| `toast(msg)` | Popup powiadomienie |
-| `showAlert(ctx)` | Ikonka błędu na przycisku |
-| `logMessage(msg, level)` | Log do pliku |
-| `hotkey(key)` | Wyzwól skrót OS |
-| `openUrl(url, local, param)` | Otwórz URL |
-| `openView(url, w, h, x, y, param)` | Otwórz popup okno |
-| `selectFileDialog(filter)` | Picker pliku |
-| `selectFolderDialog()` | Picker folderu |
+| Method | Description |
+|--------|-------------|
+| `toast(msg)` | Popup notification |
+| `showAlert(ctx)` | Error icon on the button |
+| `logMessage(msg, level)` | Write to log file |
+| `hotkey(key)` | Trigger an OS shortcut |
+| `openUrl(url, local, param)` | Open URL |
+| `openView(url, w, h, x, y, param)` | Open popup window |
+| `selectFileDialog(filter)` | File picker |
+| `selectFolderDialog()` | Folder picker |
 
-#### Zdarzenia przychodzące
+#### Incoming events
 
 | Event | Trigger |
 |-------|---------|
-| `onConnected()` | WebSocket nawiązany |
-| `onAdd(data)` | Przycisk przypisany do klawisza |
-| `onRun(data)` | Przycisk naciśnięty (główna logika) |
-| `onKeyDown(data)` | Wciśnięcie |
-| `onKeyUp(data)` | Puszczenie |
-| `onSetActive(data)` | Aktywacja/deaktywacja widoku |
-| `onClear(data)` | Przycisk usunięty (array of contexts) |
-| `onDialRotate(data)` | Obrót enkodera (dir: 1/-1) |
-| `onParamFromApp(data)` | Konfiguracja z aplikacji |
-| `onSendToPlugin(data)` | Dane z Property Inspector |
-| `onDidReceiveSettings(data)` | Odpowiedź na getSettings |
+| `onConnected()` | WebSocket established |
+| `onAdd(data)` | Button assigned to a key |
+| `onRun(data)` | Button pressed (main logic) |
+| `onKeyDown(data)` | Key down |
+| `onKeyUp(data)` | Key up |
+| `onSetActive(data)` | View activation/deactivation |
+| `onClear(data)` | Button removed (array of contexts) |
+| `onDialRotate(data)` | Encoder rotated (dir: 1/-1) |
+| `onParamFromApp(data)` | Configuration from the app |
+| `onSendToPlugin(data)` | Data from the Property Inspector |
+| `onDidReceiveSettings(data)` | Reply to getSettings |
 
 ---
 
-## PODEJŚCIE B – Bezpośredni dostęp (BEZ aplikacji)
+## APPROACH B — Direct access (NO app)
 
-### Metoda B1: Python przez USB (redphx/strmdck)
+### Method B1: Python over USB (redphx/strmdck)
 
-Projekt [redphx/strmdck](https://github.com/redphx/strmdck) – USB sniffing przez Wireshark, protokół niezaszyfrowany.
+[redphx/strmdck](https://github.com/redphx/strmdck) — protocol reverse-engineered with Wireshark, unencrypted.
 
 ```bash
 pip install strmdck
 ```
 
 ```python
-# Koncepcja – patrz aktualne README repozytorium
+# Conceptual — see the upstream repository for the current API
 from strmdck import StreamDeck
 
 deck = StreamDeck()
 deck.connect()
 
-# Ustaw obraz na przycisku (PIL Image)
+# Render an image on a button (PIL Image)
 from PIL import Image, ImageDraw
 img = Image.new('RGB', (72, 72), color='#1a1a2e')
 draw = ImageDraw.Draw(img)
 draw.text((10, 25), "Hello!", fill='white')
 deck.set_key_image(key_index=0, image=img)
 
-# Nasłuchuj zdarzeń
+# Listen for events
 def on_key_press(key, state):
-    print(f"Klawisz {key}: {'wciśnięty' if state else 'puszczony'}")
+    print(f"Key {key}: {'down' if state else 'up'}")
 
 deck.on_key_change(on_key_press)
 deck.run()
 ```
 
-### Metoda B2: ADB Root Shell (bezpośrednio na urządzeniu)
+### Method B2: ADB root shell (run code on the device)
 
-D200 ma **otwarty root ADB** – możesz uruchamiać kod bezpośrednio na urządzeniu!
+The D200 has an **open ADB root shell** — you can execute code directly on the device.
 
 ```bash
-# Sprawdź czy urządzenie jest widoczne
+# Verify the device is visible
 adb devices
 
-# Wejdź na urządzenie jako root
+# Enter the device as root
 adb shell
 
-# Sprawdź framebuffer
+# Inspect the framebuffer
 ls -la /dev/fb0
 
-# Wypchnij własny binarny program
-adb push moj_program /userdata/moj_program
-adb shell chmod +x /userdata/moj_program
-adb shell /userdata/moj_program
+# Push your own binary
+adb push my_program /userdata/my_program
+adb shell chmod +x /userdata/my_program
+adb shell /userdata/my_program
 ```
 
-#### Bezpośredni zapis do framebuffera (C++/Python)
+#### Direct framebuffer writes (C++/Python)
 
 ```cpp
-// Zapis do /dev/fb0 (dostęp przez ADB shell)
+// Write to /dev/fb0 (access via ADB shell)
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
 
 int fb = open("/dev/fb0", O_RDWR);
-// mmap i zapisuj piksele bezpośrednio
-// Format: RGB565 lub RGBA8888 (zależy od konfiguracji)
+// mmap and write pixels directly
+// Format: RGB565 or RGBA8888 (depends on configuration)
 ```
 
 ```python
-# Python przez ADB - wyślij obraz jako bajty do /dev/fb0
+# Python via ADB — send raw bytes to /dev/fb0
 import subprocess
 
 def push_image_to_display(raw_rgb_bytes):
@@ -480,9 +480,9 @@ def push_image_to_display(raw_rgb_bytes):
 
 ---
 
-## Przykłady zastosowań
+## Use Cases
 
-### 1. Ikona pokazująca zużycie CPU (plugin SDK)
+### 1. CPU usage indicator (Plugin SDK)
 
 ```javascript
 // app.js
@@ -506,12 +506,12 @@ $UD.onSetActive(({ context, active }) => {
       const icon = generateIcon(`${usage}%`, color);
       $UD.setBaseDataIcon(context, icon, 'CPU');
     }, 2000);
-    // zatrzymaj gdy nieaktywny: onSetActive({ active: false }) → clearInterval
+    // stop when inactive: onSetActive({ active: false }) → clearInterval
   }
 });
 ```
 
-### 2. Zmiana ikony co N sekund (animacja własna)
+### 2. Frame-by-frame animation
 
 ```javascript
 const frames = ['assets/frame1.png', 'assets/frame2.png', 'assets/frame3.png'];
@@ -525,7 +525,7 @@ setInterval(() => {
 }, 500);
 ```
 
-### 3. Integracja z API (pogoda, powiadomienia)
+### 3. API integration (weather, notifications)
 
 ```javascript
 $UD.onRun(async ({ context }) => {
@@ -533,40 +533,40 @@ $UD.onRun(async ({ context }) => {
   const data = await response.json();
   const temp = `${data.current.temp_c}°C`;
   const icon = generateIcon(temp, '#003366');
-  $UD.setBaseDataIcon(context, icon, 'Pogoda');
+  $UD.setBaseDataIcon(context, icon, 'Weather');
 });
 ```
 
 ---
 
-## Które podejście wybrać?
+## Which Approach to Pick?
 
-| Cel | Rekomendacja |
-|-----|-------------|
-| Szybki start, chcę pluginy integrowane z Ulanzi UI | **Podejście A** – oficjalny SDK |
-| Chcę działać bez oficjalnej aplikacji | **Podejście B1** – Python strmdck |
-| Chcę maksymalną kontrolę / uruchomić własny kod NA urządzeniu | **Podejście B2** – ADB root shell |
-| Home Assistant integracja | [redphx/homedeck](https://github.com/redphx/homedeck) |
-
----
-
-## Zasoby
-
-- [UlanziDeckPlugin-SDK](https://github.com/UlanziTechnology/UlanziDeckPlugin-SDK) – oficjalne SDK + demo (analog clock, TeamSpeak 5)
-- [plugin-common-node](https://github.com/UlanziTechnology/plugin-common-node) – Node.js library
-- [plugin-common-html](https://github.com/UlanziTechnology/plugin-common-html) – HTML/CSS library dla Property Inspector
-- [redphx/strmdck](https://github.com/redphx/strmdck) – Python USB library (bez oficjalnej aplikacji)
-- [redphx/homedeck](https://github.com/redphx/homedeck) – Home Assistant integration
-- [rlaneth/badustudio](https://github.com/rlaneth/badustudio) – Bad Apple na D200 (ADB + framebuffer, C++)
-- [Hackaday: D200 hacking](https://hackaday.com/tag/ulanzi-d200/) – artykuły techniczne
-- [HA Community thread](https://community.home-assistant.io/t/ulanzi-stream-deck-d200-with-home-assistant/846627) – dyskusja community
+| Goal | Recommendation |
+|------|----------------|
+| Quick start, plugins integrated with the Ulanzi UI | **Approach A** — official SDK |
+| Run without the official app | **Approach B1** — Python strmdck |
+| Maximum control / run your own code ON the device | **Approach B2** — ADB root shell |
+| Home Assistant integration | [redphx/homedeck](https://github.com/redphx/homedeck) |
 
 ---
 
-## Ograniczenia
+## Resources
 
-- **Podejście A**: wymaga działającej aplikacji UlanziStudio na PC
-- **Podejście A**: ikony renderowane przez app.html (kontekst przeglądarki), nie czysty Node.js
-- **Podejście B1**: protokół USB odwrotnie inżynierowany – może nie być 100% stabilny po update firmware
-- **Podejście B2**: ADB dostęp może zostać zamknięty w przyszłych aktualizacjach firmware
-- SDK licencja: **AGPL 3.0** – kod modyfikacji musi być open source jeśli udostępniasz usługę
+- [UlanziDeckPlugin-SDK](https://github.com/UlanziTechnology/UlanziDeckPlugin-SDK) — official SDK + demos (analog clock, TeamSpeak 5)
+- [plugin-common-node](https://github.com/UlanziTechnology/plugin-common-node) — Node.js library
+- [plugin-common-html](https://github.com/UlanziTechnology/plugin-common-html) — HTML/CSS library for the Property Inspector
+- [redphx/strmdck](https://github.com/redphx/strmdck) — Python USB library (no official app required)
+- [redphx/homedeck](https://github.com/redphx/homedeck) — Home Assistant integration
+- [rlaneth/badustudio](https://github.com/rlaneth/badustudio) — Bad Apple on the D200 (ADB + framebuffer, C++)
+- [Hackaday: D200 hacking](https://hackaday.com/tag/ulanzi-d200/) — technical articles
+- [HA community thread](https://community.home-assistant.io/t/ulanzi-stream-deck-d200-with-home-assistant/846627) — community discussion
+
+---
+
+## Limitations
+
+- **Approach A**: requires UlanziStudio running on the PC
+- **Approach A**: icons are rendered through app.html (browser context), not pure Node.js
+- **Approach B1**: USB protocol is reverse-engineered — may break after a firmware update
+- **Approach B2**: ADB access may be locked down in future firmware updates
+- SDK license: **AGPL 3.0** — modifications must be open-sourced if you provide a hosted service

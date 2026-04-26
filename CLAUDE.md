@@ -7,7 +7,7 @@ Research + demos for building custom plugins and direct device access for the **
 - Provide working demo plugins and USB experiments.
 
 ## Layout
-- `ULANZI-SDK-RESEARCH.md` — main research write-up (PL).
+- `ULANZI-SDK-RESEARCH.md` — main research write-up.
 - `ulanzi-demos/`
   - `SPEC-A-plugin-sdk.md`, `SPEC-B-direct-access.md` — specs for both paths.
   - `plugins/demo/com.ulanzi.demo.ulanziPlugin/` — demo plugin (Method A). Submodules: `plugin-common-node`, `plugin-common-html`.
