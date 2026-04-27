@@ -64,7 +64,9 @@ class WeatherAction extends BaseAction {
   _restartInterval(context) {
     const state = this._buttons[context];
     if (!state) return;
-    const ms = Math.max(1, state.settings.refreshMin || 15) * 60 * 1000;
+    // Floor at 5 minutes — open-meteo's free tier asks consumers to be
+    // reasonable. Defaults to 15. Lower values get clamped silently.
+    const ms = Math.max(5, state.settings.refreshMin || 15) * 60 * 1000;
     this._startInterval(context, ms, () => this._fetchWeather(context));
     this._fetchWeather(context);
     this.render(context);
