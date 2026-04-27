@@ -9,8 +9,36 @@ permissions:
   contents: write
 
 jobs:
+  verify:
+    name: Run plugin tests before publishing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin/pnpm-lock.yaml
+      - name: Install plugin deps
+        working-directory: ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin
+        run: pnpm install --frozen-lockfile
+      - name: Lint, format, typecheck, test
+        working-directory: ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin
+        run: |
+          pnpm lint
+          pnpm format:check
+          pnpm typecheck
+          pnpm test
+
   build-zip:
     name: Build plugin zip + create GitHub release
+    needs: verify
     runs-on: ubuntu-latest
 
     steps:
