@@ -45,4 +45,28 @@ describe('manifest.json ↔ uuids.js consistency', () => {
       expect(fs.existsSync(piPath)).toBe(true);
     }
   });
+
+  test('every action references an existing Icon file', () => {
+    const pluginDir = path.join(__dirname, '..');
+    for (const action of manifest.Actions) {
+      const iconPath = path.join(pluginDir, action.Icon);
+      expect(fs.existsSync(iconPath)).toBe(true);
+    }
+  });
+
+  test("every action's States[].Image points to an existing file", () => {
+    const pluginDir = path.join(__dirname, '..');
+    for (const action of manifest.Actions) {
+      for (const state of action.States || []) {
+        const imgPath = path.join(pluginDir, state.Image);
+        expect(fs.existsSync(imgPath)).toBe(true);
+      }
+    }
+  });
+
+  test('plugin-level Icon and CategoryIcon files exist', () => {
+    const pluginDir = path.join(__dirname, '..');
+    expect(fs.existsSync(path.join(pluginDir, manifest.Icon))).toBe(true);
+    expect(fs.existsSync(path.join(pluginDir, manifest.CategoryIcon))).toBe(true);
+  });
 });

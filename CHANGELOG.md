@@ -15,6 +15,7 @@ are listed under the same release header.
 - WeatherAction: clamp `refreshMin` to 5-minute floor (matches PI `min` attribute and respects open-meteo's free-tier guidance).
 - Comprehensive Canvas2D mock surface in `tests/helpers.js` — single source of truth shared with `dispatcher.test.js`. Future render primitives won't break the test suite.
 - Release workflow now runs lint + format + typecheck + tests before publishing the zip.
+- Manifest consistency tests now also verify that every `Icon`, `States[].Image`, plugin `Icon`, and `CategoryIcon` PNG file exists on disk — same class of bug as the existing PropertyInspector check (130 tests, was 126).
 
 ## [0.1.0] — 2026-04-27
 
