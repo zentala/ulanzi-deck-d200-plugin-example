@@ -87,14 +87,35 @@ describe('WeatherAction – _describeCode (WMO mapping)', () => {
     expect(a._describeCode(99).label).toBe('Thunderstorm');
   });
 
-  test('null returns dash placeholder', () => {
+  test('null returns iconType "none" with empty label', () => {
     const a = new WeatherAction();
-    expect(a._describeCode(null).emoji).toBe('—');
+    const result = a._describeCode(null);
+    expect(result.iconType).toBe('none');
+    expect(result.label).toBe('');
   });
 
-  test('unknown code falls back to "Code N"', () => {
+  test('unknown code falls back to iconType "none" + "Code N" label', () => {
     const a = new WeatherAction();
-    expect(a._describeCode(404).label).toBe('Code 404');
+    const result = a._describeCode(404);
+    expect(result.iconType).toBe('none');
+    expect(result.label).toBe('Code 404');
+  });
+
+  test('clear sky returns iconType "sun"', () => {
+    const a = new WeatherAction();
+    expect(a._describeCode(0).iconType).toBe('sun');
+  });
+
+  test('rain codes return iconType "rain"', () => {
+    const a = new WeatherAction();
+    expect(a._describeCode(63).iconType).toBe('rain');
+    expect(a._describeCode(82).iconType).toBe('rain');
+  });
+
+  test('thunderstorm codes return iconType "thunderstorm"', () => {
+    const a = new WeatherAction();
+    expect(a._describeCode(95).iconType).toBe('thunderstorm');
+    expect(a._describeCode(99).iconType).toBe('thunderstorm');
   });
 });
 
@@ -141,11 +162,13 @@ describe('WeatherAction – render', () => {
     expect(patch.getLastCanvas().texts()).toContain('OFFLINE');
   });
 
-  test('shows loading ellipsis when temp is null and loading=true', () => {
+  test('draws 3 loading dots when temp is null and loading=true', () => {
     const a = makeAction();
     a._state[CTX] = { temp: null, code: null, error: null, loading: true };
     a.render(CTX);
-    expect(patch.getLastCanvas().texts()).toContain('…');
+    // Three filled circles via arc() ops — vector, no font dependency.
+    const arcs = patch.getLastCanvas().calls.filter((c) => c.op === 'arc');
+    expect(arcs.length).toBeGreaterThanOrEqual(3);
   });
 
   test('calls $UD.setBaseDataIcon after render', () => {

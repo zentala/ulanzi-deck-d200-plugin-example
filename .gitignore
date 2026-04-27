@@ -17,3 +17,6 @@ coverage/
 .claire/
 .claude/worktrees/
 .gstack/
+
+# Generated visual previews (regenerated via scripts/preview-weather.mjs)
+ulanzi-demos/plugins/demo/*/scripts/preview-out/
