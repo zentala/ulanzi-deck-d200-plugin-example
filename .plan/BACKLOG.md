@@ -26,7 +26,7 @@ Ideas not yet planned into an epic. Lightweight list — no ceremony.
 
 ## Plugin demo — known concerns
 
-- [ ] **Verify weather emoji render on real D200** — `WeatherAction._describeCode()` uses unicode emoji (☀ ⛅ 🌧 etc.). Preview rendered via `@napi-rs/canvas` shows empty boxes (no emoji font). UlanziStudio uses Chromium so should fall back to system emoji fonts (Segoe UI Emoji on Windows, Apple Color Emoji on macOS) — but this hasn't been verified on hardware. If broken: replace emoji with vector canvas drawings (~50 LOC per icon × 8 codes).
+- [x] **Verify weather emoji render on real D200** — Resolved preventively in `89d6b54`: replaced all emoji glyphs (☀ ⛅ 🌧 ⚠ … etc.) with canvas vector primitives. No font dependency, identical render across @napi-rs/canvas, Chromium, and any future runtime.
 
 ## Shell demo
 
