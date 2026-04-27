@@ -1,0 +1,21 @@
+# EditorConfig — https://editorconfig.org
+# Top-level config: every editor that supports this file picks it up automatically.
+root = true
+
+[*]
+end_of_line = lf
+indent_style = space
+indent_size = 2
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.md]
+# Markdown intentionally uses two trailing spaces for line breaks
+trim_trailing_whitespace = false
+
+[*.{py,toml}]
+indent_size = 4
+
+[Makefile]
+indent_style = tab

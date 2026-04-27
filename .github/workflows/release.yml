@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-zip:
+    name: Build plugin zip + create GitHub release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Resolve version
+        id: ver
+        run: echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Build the plugin distribution zip
+        # Plugin folder is the unit UlanziStudio loads — zip it as-is, including
+        # the (already-cloned) submodules under libs/. Drops node_modules and
+        # any local scratch (assets/previews stays — it's referenced by README).
+        run: |
+          PLUGIN_DIR="ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin"
+          ZIP_NAME="io.zentala.ulanzideck.demo-${{ steps.ver.outputs.version }}.zip"
+          cd ulanzi-demos/plugins/demo
+          zip -r "../../../$ZIP_NAME" \
+            io.zentala.ulanzideck.demo.ulanziPlugin \
+            -x "*/node_modules/*" \
+            -x "*/.git/*" \
+            -x "*/scripts/preview-out/*"
+          cd ../../..
+          ls -lh "$ZIP_NAME"
+          echo "zip=$ZIP_NAME" >> "$GITHUB_OUTPUT"
+        id: zip
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.ver.outputs.version }}" \
+            "${{ steps.zip.outputs.zip }}" \
+            --generate-notes \
+            --title "${{ steps.ver.outputs.version }}" \
+            --notes "Drop-in plugin zip — unzip into \`%APPDATA%\\ulanzi\\plugins\\\` (Windows) or \`~/Library/Application Support/ulanzi/plugins/\` (macOS), then restart UlanziStudio. No git or pnpm required."

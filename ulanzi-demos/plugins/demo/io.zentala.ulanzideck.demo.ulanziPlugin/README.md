@@ -1,5 +1,9 @@
 # Ulanzi Demo Plugin
 
+[![CI](https://github.com/zentala/ulanzi-deck-d200-plugin-example/actions/workflows/ci.yml/badge.svg)](https://github.com/zentala/ulanzi-deck-d200-plugin-example/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](../../../../LICENSE)
+[![Tests](https://img.shields.io/badge/tests-126-success.svg)](tests/)
+
 Reference implementation of an Ulanzi D200 plugin using the official SDK.
 Demonstrates canvas rendering, settings persistence, lifecycle event handling,
 Property Inspector wiring, and HTTP fetch across six independent actions.

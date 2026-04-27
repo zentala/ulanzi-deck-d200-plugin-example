@@ -7,7 +7,7 @@ Ideas not yet planned into an epic. Lightweight list — no ceremony.
 - [ ] **Screenshot or short GIF of plugin running on D200 in root README** — strongest magnet for new users; needs to be filmed once on real hardware
 - [ ] Add a `Makefile` (or root `package.json` task) to run all tests across demos with one command
 - [ ] CI: extend GitHub Actions to actually run plugin tests on push (currently lint-only); needs to verify pnpm + Jest in CI
-- [ ] Pre-built plugin zip release on GitHub (so non-devs can install without building)
+- [x] **Pre-built plugin zip release on GitHub** — `.github/workflows/release.yml` builds + uploads `io.zentala.ulanzideck.demo-<tag>.zip` on every `v*` tag push. Non-devs unzip into the UlanziStudio plugins folder, no git/pnpm needed.
 - [ ] **Upgrade GitHub Actions to Node 24 runtime before 2026-06-02 deadline** — `actions/checkout@v4`, `actions/setup-node@v4`, `actions/setup-python@v5`, `pnpm/action-setup@v4` are deprecated (Node 20). **First step: check library/action compatibility** — verify each action's latest version, that pnpm v10 + lockfile work on the new runtime, that pytest 3.11 setup is unchanged. Only then bump the workflow.
 - [x] **Add a manifest↔code UUID consistency test** — Done in `14bbdb4`. 5-test suite in `tests/manifest.test.js` covering plugin UUID match, action UUID coverage both ways, plugin prefix, and PI file existence on disk.
 - [x] **Enable real `pnpm typecheck` for plugin demo** — Done in `f5bd304` (merged via `feat/typecheck-real`). Caught 2 latent bugs: `autoPaused` field missing from PomodoroAction JSDoc, `|| {}` fallback masking alert shape in StatusAction. Wired into pre-commit and CI between lint and test.
