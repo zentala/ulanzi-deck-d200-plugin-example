@@ -14,6 +14,7 @@ const PLUGIN_DIR = path.join(__dirname, '..', 'plugin');
 const read = (rel) => fs.readFileSync(path.join(PLUGIN_DIR, rel), 'utf8');
 
 const { UUIDS } = require('../plugin/uuids.js');
+const { BROWSER_SHIMS } = require('./helpers');
 
 const ACTION_IDS = {
   clock: UUIDS.CLOCK,
@@ -66,31 +67,10 @@ function createDispatcherSandbox() {
     onDialRotate: jest.fn(),
   };
 
-  // Canvas shim (inline — same as BROWSER_SHIMS but without external dep)
-  const canvasShim = `
-const document = {
-  createElement: (tag) => {
-    if (tag !== 'canvas') return {};
-    const calls = [];
-    const ctx = {
-      calls, fillStyle:'', strokeStyle:'', lineWidth:0, font:'',
-      textAlign:'center', textBaseline:'middle',
-      fillRect:   (...a) => calls.push({op:'fillRect', args:a}),
-      strokeRect: (...a) => calls.push({op:'strokeRect', args:a}),
-      fillText:   (t,x,y) => calls.push({op:'fillText', text:t, x, y}),
-      createLinearGradient: () => ({addColorStop:()=>{}}),
-      setLineDash: (d) => calls.push({op:'setLineDash', dash:d}),
-      lineDashOffset: 0,
-      beginPath:()=>{}, moveTo:()=>{}, lineTo:()=>{}, arcTo:()=>{},
-      arc:()=>{}, ellipse:()=>{}, closePath:()=>{}, stroke:()=>{}, fill:()=>{}, save:()=>{}, restore:()=>{},
-    };
-    return { getContext:()=>ctx, width:196, height:196, toDataURL:()=>'data:image/png;base64,MOCK' };
-  }
-};
-const URL = { createObjectURL: () => 'blob:mock' };
-class Worker { constructor(){} terminate(){} }
-const fetch = () => Promise.reject(new Error('fetch not available'));
-`;
+  // Canvas shim — reuse the same comprehensive recording-ctx factory
+  // helpers.js uses, so dispatcher tests survive any future Canvas2D
+  // method that gets added to actions.
+  const canvasShim = BROWSER_SHIMS;
 
   const sandbox = {
     $UD,
