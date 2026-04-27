@@ -8,7 +8,8 @@
     "format": "prettier --write plugin/ tests/",
     "format:check": "prettier --check plugin/ tests/",
     "typecheck": "tsc -p jsconfig.json",
-    "generate-icons": "node scripts/generate-icons.mjs"
+    "generate-icons": "node scripts/generate-icons.mjs",
+    "previews": "node scripts/generate-action-previews.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

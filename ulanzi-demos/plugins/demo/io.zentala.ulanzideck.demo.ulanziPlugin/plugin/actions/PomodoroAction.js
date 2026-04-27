@@ -129,18 +129,57 @@ class PomodoroAction extends BaseAction {
       if (ps.state === 'work') {
         ps.count += 1;
         this._stopInterval(context);
-        $UD.toast('\uD83C\uDF45 Work done! Take a break.');
+        $UD.toast('Work done! Take a break.');
         this._startBreak(context);
       } else if (ps.state === 'break') {
         this._stopInterval(context);
         ps.state = 'idle';
-        $UD.toast('\u2615 Break over! Back to work.');
+        $UD.toast('Break over! Back to work.');
         this.render(context);
       }
       return;
     }
 
     this.render(context);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Drawing helpers — vector tomato (no emoji font dependency)
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Draw a stylised tomato centred on (cx, cy) with body radius `r`.
+   * Red round body + green stem + 2 leaves on top.
+   *
+   * @param {CanvasRenderingContext2D} ctx
+   * @param {number} cx
+   * @param {number} cy
+   * @param {number} r  body radius
+   */
+  _drawTomato(ctx, cx, cy, r) {
+    ctx.save();
+    // Body (red circle, slightly squashed)
+    ctx.fillStyle = '#e84a3f';
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+    // Highlight (small lighter circle in upper-left)
+    ctx.fillStyle = 'rgba(255,255,255,0.18)';
+    ctx.beginPath();
+    ctx.arc(cx - r * 0.35, cy - r * 0.4, r * 0.25, 0, Math.PI * 2);
+    ctx.fill();
+    // Stem (small green rectangle on top)
+    ctx.fillStyle = '#2e7d32';
+    ctx.fillRect(cx - r * 0.1, cy - r - r * 0.25, r * 0.2, r * 0.3);
+    // Leaves (two ellipses fanning outward)
+    ctx.fillStyle = '#43a047';
+    ctx.beginPath();
+    ctx.ellipse(cx - r * 0.4, cy - r + 1, r * 0.4, r * 0.18, -0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(cx + r * 0.4, cy - r + 1, r * 0.4, r * 0.18, 0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
   }
 
   // ---------------------------------------------------------------------------
@@ -179,11 +218,8 @@ class PomodoroAction extends BaseAction {
     });
 
     if (ps.state === 'idle') {
-      // Tomato + tap instruction
-      this.renderText(ctx, '\uD83C\uDF45', SIZE / 2, 95, {
-        font: '52px sans-serif',
-        color: '#ffffff',
-      });
+      // Tomato drawn as canvas primitives — no emoji font dependency.
+      this._drawTomato(ctx, SIZE / 2, 88, 28);
       this.renderText(ctx, 'TAP TO START', SIZE / 2, 148, {
         font: '14px sans-serif',
         color: 'rgba(255,255,255,0.5)',
@@ -211,11 +247,14 @@ class PomodoroAction extends BaseAction {
       ctx.restore();
     }
 
-    // Bottom: completed pomodoro count
+    // Bottom: completed pomodoro count — small tomato + ×N
     if (ps.count > 0) {
-      this.renderText(ctx, `\uD83C\uDF45\u00D7${ps.count}`, SIZE / 2, 178, {
+      const countX = SIZE / 2 - 10;
+      this._drawTomato(ctx, countX, 178, 7);
+      this.renderText(ctx, `×${ps.count}`, SIZE / 2 + 8, 178, {
         font: '16px sans-serif',
-        color: 'rgba(255,255,255,0.6)',
+        color: 'rgba(255,255,255,0.7)',
+        align: 'left',
       });
     }
 

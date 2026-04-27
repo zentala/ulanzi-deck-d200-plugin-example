@@ -17,3 +17,12 @@ echo "→ format check"
 pnpm format:check
 echo "→ typecheck"
 pnpm typecheck
+
+# If any action source changed, regenerate previews so README stays accurate.
+# Auto-stages the regenerated PNGs — single source of truth, no manual step.
+ACTION_CHANGED=$(git diff --cached --name-only --relative | grep -E "^plugin/actions/.*Action\.js$" || true)
+if [ -n "$ACTION_CHANGED" ]; then
+  echo "→ action changed — regenerating assets/previews/*.png"
+  pnpm previews
+  git add assets/previews/
+fi

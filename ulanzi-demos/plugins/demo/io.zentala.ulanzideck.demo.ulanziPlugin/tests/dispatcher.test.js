@@ -82,7 +82,7 @@ const document = {
       setLineDash: (d) => calls.push({op:'setLineDash', dash:d}),
       lineDashOffset: 0,
       beginPath:()=>{}, moveTo:()=>{}, lineTo:()=>{}, arcTo:()=>{},
-      arc:()=>{}, closePath:()=>{}, stroke:()=>{}, fill:()=>{}, save:()=>{}, restore:()=>{},
+      arc:()=>{}, ellipse:()=>{}, closePath:()=>{}, stroke:()=>{}, fill:()=>{}, save:()=>{}, restore:()=>{},
     };
     return { getContext:()=>ctx, width:196, height:196, toDataURL:()=>'data:image/png;base64,MOCK' };
   }
