@@ -9,18 +9,24 @@ Ideas not yet planned into an epic. Lightweight list — no ceremony.
 - [ ] CI: extend GitHub Actions to actually run plugin tests on push (currently lint-only); needs to verify pnpm + Jest in CI
 - [ ] Pre-built plugin zip release on GitHub (so non-devs can install without building)
 - [ ] **Upgrade GitHub Actions to Node 24 runtime before 2026-06-02 deadline** — `actions/checkout@v4`, `actions/setup-node@v4`, `actions/setup-python@v5`, `pnpm/action-setup@v4` are deprecated (Node 20). **First step: check library/action compatibility** — verify each action's latest version, that pnpm v10 + lockfile work on the new runtime, that pytest 3.11 setup is unchanged. Only then bump the workflow.
-- [ ] **Add a manifest↔code UUID consistency test** — Jest test that parses `manifest.json` and asserts every action UUID is present in `plugin/uuids.js` and vice versa. Catches drift like the clock inspector having `com.ulanzi.demo.clock` (3-segment) while manifest had `com.ulanzi.ulanzideck.demo.clock` (5-segment) — pre-existing bug fixed during 2026-04-26 rename.
+- [x] **Add a manifest↔code UUID consistency test** — Done in `14bbdb4`. 5-test suite in `tests/manifest.test.js` covering plugin UUID match, action UUID coverage both ways, plugin prefix, and PI file existence on disk.
 - [x] **Enable real `pnpm typecheck` for plugin demo** — Done in `f5bd304` (merged via `feat/typecheck-real`). Caught 2 latent bugs: `autoPaused` field missing from PomodoroAction JSDoc, `|| {}` fallback masking alert shape in StatusAction. Wired into pre-commit and CI between lint and test.
 
 ## Plugin demo
 
-- [ ] More actions to showcase the SDK surface: weather, notifications, media controls
+- [ ] More actions to showcase the SDK surface: notifications, media controls
 - [ ] Screenshot per action in plugin README
+- [ ] **Voice dictation action (Wispr Flow trigger)** — single-button action that fires a configurable hotkey (default `ctrl+alt+space` — Wispr Flow's default activation) via `$UD.hotkey()`. Visual: idle mic icon → recording state with pulsing ring while held. Educational value: shows hotkey dispatch + button visual feedback for stateful input. Generic enough that it works with any push-to-talk tool (Wispr Flow, Whisper Memos, Win+H Windows dictation, macOS Voice Control).
+- [ ] **PowerShell / quick-command launcher action** — press launches a configurable command bar (Windows Terminal quake mode `wt.exe` with `--quake`, or PowerToys Run, or a user-specified executable + args). Settings: `command`, `args[]`, `workingDir`. Educational value: shows `$UD.openUrl()` for custom protocols + how to spawn external processes from a button. Generic launcher pattern reusable for any CLI/REPL.
 
 ## USB demo
 
 - [ ] Replace `strmdck` pre-release with a stable version once upstream tags one
 - [ ] Add layout switching (different button arrangements via CLI flag)
+
+## Plugin demo — known concerns
+
+- [ ] **Verify weather emoji render on real D200** — `WeatherAction._describeCode()` uses unicode emoji (☀ ⛅ 🌧 etc.). Preview rendered via `@napi-rs/canvas` shows empty boxes (no emoji font). UlanziStudio uses Chromium so should fall back to system emoji fonts (Segoe UI Emoji on Windows, Apple Color Emoji on macOS) — but this hasn't been verified on hardware. If broken: replace emoji with vector canvas drawings (~50 LOC per icon × 8 codes).
 
 ## Shell demo
 
