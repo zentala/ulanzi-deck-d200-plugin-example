@@ -20,3 +20,16 @@ coverage/
 
 # Generated visual previews (regenerated via scripts/preview-weather.mjs)
 ulanzi-demos/plugins/demo/*/scripts/preview-out/
+
+# === Hook artifacts (auto-regenerated; never commit) ===
+.claude/.last-done-nudge
+.claude/.last-cleanup
+.claude/.auto-build.log
+.claude/.auto-install.log
+.claude/.error-counts.tmp
+.plan/.error-counts.tmp
+
+# === Git worktrees (parallel branch checkouts, NOT branch content) ===
+.claude/worktrees/
+.claude-worktrees/
+
