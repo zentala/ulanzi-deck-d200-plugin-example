@@ -1,0 +1,9 @@
+dir: .plan
+
+ignore:
+  - reports
+  - investigations
+  - vision
+  - handoffs
+  - impro
+  - adr
