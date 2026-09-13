@@ -19,10 +19,10 @@ jobs:
           submodules: recursive
       - uses: pnpm/action-setup@v5
         with:
-          version: 10
+          version: 10.12.1
       - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
           cache-dependency-path: ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin/pnpm-lock.yaml
       - name: Install plugin deps
@@ -78,4 +78,4 @@ jobs:
             "${{ steps.zip.outputs.zip }}" \
             --generate-notes \
             --title "${{ steps.ver.outputs.version }}" \
-            --notes "Drop-in plugin zip — unzip into \`%APPDATA%\\ulanzi\\plugins\\\` (Windows) or \`~/Library/Application Support/ulanzi/plugins/\` (macOS), then restart UlanziStudio. No git or pnpm required."
+            --notes "Drop-in plugin zip — unzip into \`%APPDATA%\\ulanzi\\plugins\\` (Windows) or \`~/Library/Application Support/ulanzi/plugins/\` (macOS), then restart UlanziStudio. No git or pnpm required."
