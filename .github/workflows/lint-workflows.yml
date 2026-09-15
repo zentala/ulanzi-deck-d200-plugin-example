@@ -1,0 +1,7 @@
+name: Lint Workflows
+on:
+  pull_request:
+    paths: ['.github/workflows/**']
+jobs:
+  lint:
+    uses: zentala/.github/.github/workflows/reusable-lint-workflows.yml@main

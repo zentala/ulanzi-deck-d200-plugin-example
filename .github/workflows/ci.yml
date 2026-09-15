@@ -7,16 +7,30 @@ on:
       - "**.md"
       - "docs/**"
       - ".plan/**"
+      - "README*"
+      - "LICENSE"
+      - "CHANGELOG*"
   pull_request:
     paths-ignore:
       - "**.md"
       - "docs/**"
       - ".plan/**"
+      - "README*"
+      - "LICENSE"
+      - "CHANGELOG*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
 
 jobs:
   plugin:
     name: Plugin demo (Node)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: ulanzi-demos/plugins/demo/io.zentala.ulanzideck.demo.ulanziPlugin
@@ -41,6 +55,7 @@ jobs:
   usb-demo:
     name: USB demo (Python)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: ulanzi-demos/usb/demo
